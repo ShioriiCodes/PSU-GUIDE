@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PSU-GUIDE | Palawan State University Quezon Campus</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/Assets/css/style.css">
+</head>
+<body class="bg-[#F4E7E1] text-[#521C0D]">
+
+  <!-- Navbar -->
+  <nav class="bg-[#521C0D] text-white p-4 shadow-md sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <img src="/Assets/image/Logo/PSU Logo.png" alt="PSU Logo" class="h-14 w-auto">
+        <div class="text-xl font-bold">PSU-GUIDE</div>
+      </div>
+      <ul id="nav-links" class="flex space-x-6 font-poppins">
+        <li><a href="index.html" class="nav-link pb-1 border-b-4 border-transparent hover:border-[#E17C5F] transition">Home</a></li>
+        <li><a href="about.html" class="nav-link pb-1 border-b-4 border-transparent hover:border-[#E17C5F] transition">About</a></li>
+        <li><a href="announcement.html" class="nav-link pb-1 border-b-4 border-transparent hover:border-[#E17C5F] transition">Announcements</a></li>
+        <li><a href="contact.html" class="nav-link pb-1 border-b-4 border-transparent hover:border-[#E17C5F] transition">Contact</a></li>
+        <li>
+          <a href="login.html" class="bg-[#D5451B] text-white px-6 py-2 rounded-md font-bold hover:bg-[#aa3715] transition">
+            Log In
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+<!-- CONTACT PAGE -->
+<section class="bg-[#fbf6f4] pt-10 px-4 font-[Poppins]">
+  <div class="max-w-[1200px] mx-auto flex flex-col lg:flex-row justify-between items-start gap-12 h-[90vh]">
+    <!-- Map and Contact Info (Left Side) -->
+    <div class="w-full lg:w-1/2">
+      <iframe class="w-full h-64 sm:h-80 md:h-96 lg:h-[450px] rounded-lg shadow"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d125693.96323155067!2d118.0307!3d9.0605!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a3138b2b40b84d%3A0x8b0e9c2bfb13c7bb!2sPalawan%20State%20University%20-%20Quezon%20Campus!5e0!3m2!1sen!2sph!4v1629136932709!5m2!1sen!2sph"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+      <div class="text-[#521C0D] mt-6 space-y-3 text-sm md:text-base">
+        <div class="flex items-center gap-2">
+          <img src="/assets/image/icon/location.png" alt="Location Icon" class="w-7 h-7">
+          <span><strong>Location:</strong> Palawan State University – Quezon Campus</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <img src="/assets/image/icon/email.png" alt="Email Icon" class="w-7 h-7">
+          <span><strong>Email:</strong> psuguide@gmail.com</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <img src="/assets/image/icon/phone.png" alt="Phone Icon" class="w-7 h-7">
+          <span><strong>Phone:</strong> +63 912 345 6789</span>
+        </div>
+        <div class="flex items-center gap-4 mt-4 text-sm md:text-base">
+          <a href="https://facebook.com/psuquezon" target="_blank" class="flex items-center gap-2">
+            <img src="/assets/image/icon/facebook.png" alt="Facebook Icon" class="w-7 h-7"> Facebook
+          </a>
+          <a href="mailto:psuguide@gmail.com" class="flex items-center gap-2">
+            <img src="/assets/image/icon/gmail.png" alt="Mail Icon" class="w-7 h-7"> Email Us
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Form (Right Side, centered) -->
+    <div class="w-full lg:w-[40%] max-w-md bg-white shadow-md rounded-lg p-6 mx-auto lg:mx-0">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-[#521C0D] mb-2">Contact Us</h1>
+        <p class="text-[#521C0D] text-sm">Got questions or feedback? Reach out and we’ll get back to you.</p>
+      </div>
+
+      <form action="send-contact.php" method="POST" class="space-y-5">
+        <div>
+          <label class="block text-[#521C0D] font-semibold mb-1 text-sm">Full Name</label>
+          <input type="text" name="name" required
+            class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-[#521C0D] focus:outline-none focus:border-[#D5451B] text-sm">
+        </div>
+        <div>
+          <label class="block text-[#521C0D] font-semibold mb-1 text-sm">Email Address</label>
+          <input type="email" name="email" required
+            class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-[#521C0D] focus:outline-none focus:border-[#D5451B] text-sm">
+        </div>
+        <div>
+          <label class="block text-[#521C0D] font-semibold mb-1 text-sm">Message</label>
+          <textarea name="message" rows="4" required
+            class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-[#521C0D] focus:outline-none focus:border-[#D5451B] text-sm"></textarea>
+        </div>
+
+        <input type="hidden" name="_redirect" value="thanks.html">
+        <div class="text-center">
+          <button type="submit"
+            class="bg-[#D5451B] text-white font-semibold px-6 py-2 rounded-full hover:bg-[#FF9B45] transition text-sm">
+            Send Message
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center mt-10 text-xs text-[#521C0D]">
+        <p>Email us directly at <a href="mailto:psuguide@gmail.com" class="underline text-[#D5451B]">psuguide@gmail.com</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Footer -->
+  <footer class="bg-[#D5451B] text-white text-center py-6">
+    <p>&copy; 2025 PSU-GUIDE | Palawan State University Quezon Campus</p>
+    <p>Contact: psuguide@gmail.com "example"</p>
+  </footer>
+
+  <script src="/Assets/js/script.js"></script>
+
+</body>
+</html>
+

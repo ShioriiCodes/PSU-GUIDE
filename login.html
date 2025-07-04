@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PSU-GUIDE | Palawan State University Quezon Campus</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/Assets/css/style.css">
+</head>
+<body class="bg-[#F4E7E1] text-[#521C0D]">
+
+<!-- Login Page Section -->
+<section class="bg-[#F4E7E1] py-20 h-[85vh] font-[Poppins]">
+  <div class="container mx-auto px-6 max-w-md">
+    <div class="bg-white p-8 rounded-xl shadow-lg mt-10 border border-[#FF9B45]">
+      <h2 class="text-2xl font-bold text-center text-[#D5451B] mb-6">Student Login</h2>
+      <form onsubmit="event.preventDefault(); validateLogin();">
+        <div class="mb-4">
+          <label for="studentNumber" class="block text-sm font-semibold text-[#521C0D] mb-2">Student Number</label>
+          <input type="text" id="studentNumber" placeholder="e.g. 2025-XXXXX"
+            class="w-full px-4 py-2 border border-[#FF9B45] rounded-md bg-[#fbf6f4] text-[#521C0D] focus:outline-none focus:ring-2 focus:ring-[#D5451B]">
+        </div>
+        <div class="mb-6">
+          <label for="password" class="block text-sm font-semibold text-[#521C0D] mb-2">Password</label>
+          <div class="relative">
+            <input type="password" id="password"
+              class="w-full px-4 py-2 border border-[#FF9B45] rounded-md bg-[#fbf6f4] text-[#521C0D] focus:outline-none focus:ring-2 focus:ring-[#D5451B] pr-10">
+            <img src="/assets/image/icon/open-eye.png" id="toggleIcon" onclick="togglePassword()" class="absolute top-1/2 right-3 transform -translate-y-1/2 h-3 w-auto cursor-pointer" alt="Toggle visibility">
+          </div>
+        </div>
+        <div id="errorBox" class="text-sm text-red-600 mb-4 hidden">Error message here</div>
+
+        <div class="flex gap-2">
+          <button type="submit"
+            class="w-full bg-[#D5451B] text-white py-2 rounded-md font-bold hover:bg-[#FF9B45] transition">Log In</button>
+          <a href="/" class="w-full">
+            <button type="button"
+              class="w-full bg-gray-400 text-white py-2 rounded-md font-bold hover:bg-gray-600 transition">Cancel</button>
+          </a>
+        </div>
+
+        <p class="text-center text-sm text-[#521C0D] mt-4">Don't have access? Contact the registrar's office.</p>
+
+        <div class="mt-4 flex items-center justify-between">
+          <label class="inline-flex items-center">
+            <input type="checkbox" class="form-checkbox h-4 w-4 text-[#D5451B]">
+            <span class="ml-2 text-sm text-[#521C0D]">Remember me</span>
+          </label>
+          <a href="#" class="text-sm text-[#D5451B] hover:underline">Forgot password?</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-[#D5451B] text-white text-center py-6 fixed bottom-0 left-0 w-full">
+  <p>&copy; 2025 PSU-GUIDE | Palawan State University Quezon Campus</p>
+  <p>Contact: psuguide@gmail.com</p>
+</footer>
+
+  <script src="/Assets/js/script.js"></script>
+
+</body>
+</html>
