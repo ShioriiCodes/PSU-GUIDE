@@ -7,7 +7,7 @@
 ## 🌐 Live Demo
 
 [Visit PSU-GUIDE](https://psu-guide.free.nf/)  
-*(upcoming soon)*
+*(more incoming soon)*
 
 ---
 
