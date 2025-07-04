@@ -6,8 +6,8 @@
 
 ## 🌐 Live Demo
 
-[Visit PSU-GUIDE]("Soon")  
-*(replace with actual link if deployed)*
+[Visit PSU-GUIDE]()  
+*(upcoming soon)*
 
 ---
 
