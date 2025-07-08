@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
-<body class="bg-[#F4E7E1] text-[#521C0D] h-screen">
+<body class="bg-[#0f0f0f] h-screen">
 
   @yield('content')
 

@@ -1,15 +1,26 @@
-  const links = document.querySelectorAll('#nav-links .nav-link');
-  const currentPath = window.location.pathname;
+  document.addEventListener("DOMContentLoaded", () => {
+    const links = document.querySelectorAll('#nav-links .nav-link');
+    const currentPath = window.location.pathname.replace(/\/$/, "");
 
-  links.forEach(link => {
-    const linkPath = new URL(link.href).pathname;
+    let matched = false;
 
-    // Match exact paths
-    if (linkPath === currentPath) {
-      link.classList.add("border-[#E17C5F]");
+    links.forEach(link => {
+      const linkPath = new URL(link.href).pathname.replace(/\/$/, "");
+
+      if (linkPath === currentPath) {
+        link.classList.add("border-[#F15B24]");
+        matched = true;
+      }
+    });
+
+    // Fallback for Home if no other match
+    if (!matched && (currentPath === "" || currentPath === "/")) {
+      const homeLink = document.getElementById("nav-home");
+      if (homeLink) {
+        homeLink.classList.add("border-[#F15B24]");
+      }
     }
   });
-
   
   // Announcement Page Script
   const buttons = document.querySelectorAll('.filter-btn');

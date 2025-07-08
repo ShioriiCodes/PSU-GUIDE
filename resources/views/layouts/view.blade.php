@@ -11,11 +11,11 @@
 <!-- Optional Header -->
 <header class="bg-white shadow-md py-6 px-6 flex justify-center items-center">
     <div class="flex items-center w-full max-w-3xl mx-auto">
-        <img src="{{ asset('logo/iconb.png') }}" alt="PSU Logo" class="h-12 w-12 mr-4">
+        <img src="{{asset('logo/logo1.png')}}" alt="PSU Logo" class="h-12 w-12 mr-4">
         <h1 class="text-3xl font-extrabold text-gray-800 text-center flex-1">
             @yield('header', 'PSU-GUIDE')
         </h1>
-        <img src="{{ asset('logo/iconb.png') }}" alt="PSU Logo" class="h-12 w-12 ml-4">
+        <img src="{{asset('logo/logo1.png')}}" alt="PSU Logo" class="h-12 w-12 ml-4">
     </div>
 </header>
 

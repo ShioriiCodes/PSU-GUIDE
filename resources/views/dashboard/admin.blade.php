@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/png">
 </head>
 <body class="bg-[#F4E7E1] font-poppins">
   <div class="min-h-screen flex">
@@ -15,13 +16,14 @@
         <h2 class="text-xl font-semibold mb-4">Admin Panel</h2>
         <nav class="space-y-2">
             <button id="btn-dashboard" onclick="showPanel('dashboard')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F] bg-[#E17C5F] text-white">Dashboard</button>
+            <button id="btn-postPanel" onclick="showPanel('postPanel')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Create Post</button>
             <button id="btn-pending" onclick="showPanel('pending')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Pending Approvals</button>
             <button id="btn-allPosts" onclick="showPanel('allPosts')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">All Posts</button>
             <button id="btn-moderators" onclick="showPanel('moderators')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Moderators</button>
             <button id="btn-students" onclick="showPanel('students')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Manage Students</button>
             <button id="btn-faculty" onclick="showPanel('faculty')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Faculty Accounts</button>
             <button id="btn-settings" onclick="showPanel('settings')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Admin Settings</button>
-            <button id="btn-logs" onclick="showPanel('activityLogs')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Activity Logs</button>
+            <button id="btn-activityLogs" onclick="showPanel('activityLogs')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Activity Logs</button>
             <button id="btn-analytics" onclick="showPanel('analytics')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Site Analytics</button>
             <button id="btn-notifications" onclick="showPanel('notifications')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Notifications</button>
             <form id="logout-form" action="{{ route('logout') }}" method="POST">
@@ -78,6 +80,52 @@
                 </div>
             </div>
         </section>
+
+            <!-- Faculty Announcement Post Panel -->
+        <section id="postPanel" class="panel bg-white shadow-md rounded-xl p-6 max-w-3xl mx-auto my-10 hidden">
+            <h1 class="text-2xl font-bold mb-6 text-[#521C0D]">Create Faculty Announcement</h1>
+
+            <form action="{{ route('announcement.store') }}" method="POST" class="space-y-5">
+                @csrf
+
+                <!-- Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input type="text" name="title" id="title" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF9B45]" placeholder="Enter announcement title" required>
+                </div>
+
+                <!-- Content -->
+                <div>
+                    <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                    <textarea name="content" id="content" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF9B45]" placeholder="Enter announcement content..." required></textarea>
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select name="category_id" id="category_id" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF9B45]" required>
+                        <option value="">-- Select Category --</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Approval -->
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" name="is_approved" id="is_approved" class="rounded border-gray-300 text-[#FF9B45] focus:ring-[#FF9B45]">
+                    <label for="is_approved" class="text-sm text-gray-700">Mark as Approved</label>
+                </div>
+
+                <!-- Submit -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full sm:w-auto bg-[#F15B24] hover:bg-[#FF9B45] text-white font-semibold px-6 py-2 rounded-md shadow-sm transition">
+                        Post Announcement
+                    </button>
+                </div>
+            </form>
+        </section>
+
 
         <!-- All Posts -->
         <section id="allPosts" class="panel hidden">
@@ -218,7 +266,7 @@
                         <tr>
                             <td class="px-6 py-4">{{ $student->name }}</td>
                             <td class="px-6 py-4">{{ $student->email }}</td>
-                            <td class="px-6 py-4">{{ $student->department_id ?? 'N/A' }}</td>
+                            <td class="px-6 py-4">{{ $student->department->name ?? 'N/A' }}</td>
 
                             <td class="px-6 py-4">
                                 @if ($student->status === 'active')
@@ -477,7 +525,7 @@
                 </div>
             </div>
         </section>
-        
+
     <!-- Notifications Panel -->
     <section id="notifications" class="panel hidden">
         <h1  class="text-2xl font-bold mb-6">Notifications</h1>

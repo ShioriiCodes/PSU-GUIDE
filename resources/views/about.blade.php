@@ -6,7 +6,7 @@
 @section('content')
 
   <!-- ABOUT PAGE -->
-  <section class="bg-[#F4E7E1] text-[#521C0D] px-4 sm:px-6 py-20">
+  <section class="bg-[#F4E7E1] text-black px-4 sm:px-6 py-20">
     <!-- Page Header -->
     <div class="max-w-[1400px] mx-auto text-center mb-12">
       <h1 class="text-3xl sm:text-4xl font-bold mb-4">What is PSU-GUIDE?</h1>
@@ -27,7 +27,7 @@
         From enrollment schedules to campus events, student elections to class suspensions — everything you need to know
         is posted here after official verification. No more guesswork or misinformation.
       </p>
-      <ul class="list-disc list-inside text-[#521C0D]">
+      <ul class="list-disc list-inside text-black">
         <li>Official updates directly from PSU departments like Registrar and USG</li>
         <li>Access through your PSU student number — no need to register</li>
         <li>Guest users can still view general announcements</li>
@@ -61,7 +61,7 @@
 
       <!-- Guest Access -->
       <div class="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition text-center">
-        <img src="{{asset('image/icon/gues.png')}}" alt="Guest Icon" class="mx-auto mb-3 h-12 w-12">
+        <img src="{{asset('image/icon/guest.png')}}" alt="Guest Icon" class="mx-auto mb-3 h-12 w-12">
         <h3 class="font-bold text-lg mb-2">Guest-Friendly</h3>
         <p class="text-sm">Non-PSU users can still access public updates such as events or notices.</p>
       </div>
@@ -74,10 +74,10 @@
         This platform is more than just a website — it's a solution. PSU-GUIDE bridges communication gaps, promotes transparency, and helps students stay informed and connected with what’s happening in our campus.
       </p>
       <a href="contact.html"
-        class="inline-block bg-[#D5451B] text-white px-6 py-3 rounded-md font-bold hover:bg-[#FF9B45] transition">
+        class="inline-block bg-[#D5451B] text-white px-6 py-3 rounded-md hover:bg-[#FF9B45] transition">
         Learn More About This Project
       </a>
     </div>
   </section>
   
- @endsection
+@endsection

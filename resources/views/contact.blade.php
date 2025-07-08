@@ -19,7 +19,7 @@
             referrerpolicy="no-referrer-when-downgrade">
           </iframe>
 
-          <div class="text-[#521C0D] mt-6 space-y-4 text-sm sm:text-base">
+          <div class="text-black mt-6 space-y-4 text-sm sm:text-base">
             <div class="flex items-start gap-2">
               <img src="{{asset('image/icon/location.png')}}" alt="Location Icon" class="w-6 h-6 mt-1">
               <span><strong>Location:</strong> Palawan State University – Quezon Campus</span>
@@ -46,31 +46,31 @@
         <!-- Contact Form (Right Side) -->
         <div class="w-full lg:w-[40%] max-w-md bg-white shadow-md rounded-lg p-6 mx-auto lg:mx-0">
           <div class="text-center mb-8">
-            <h1 class="text-2xl sm:text-3xl font-bold text-[#521C0D] mb-2">Contact Us</h1>
-            <p class="text-[#521C0D] text-sm">Got questions or feedback? Reach out and we’ll get back to you.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-black mb-2">Contact Us</h1>
+            <p class="text-black text-sm">Got questions or feedback? Reach out and we’ll get back to you.</p>
           </div>
 
           <form action="send-contact.php" method="POST" class="space-y-5">
             <div>
-              <label class="block text-[#521C0D] font-semibold mb-1 text-sm">Full Name</label>
+              <label class="block text-black font-semibold mb-1 text-sm">Full Name</label>
               <input type="text" name="name" required
-                class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-[#521C0D] focus:outline-none focus:border-[#D5451B] text-sm">
+                class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-black focus:outline-none focus:border-[#D5451B] text-sm">
             </div>
             <div>
-              <label class="block text-[#521C0D] font-semibold mb-1 text-sm">Email Address</label>
+              <label class="block text-black font-semibold mb-1 text-sm">Email Address</label>
               <input type="email" name="email" required
-                class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-[#521C0D] focus:outline-none focus:border-[#D5451B] text-sm">
+                class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-black focus:outline-none focus:border-[#D5451B] text-sm">
             </div>
             <div>
-              <label class="block text-[#521C0D] font-semibold mb-1 text-sm">Message</label>
+              <label class="block text-black font-semibold mb-1 text-sm">Message</label>
               <textarea name="message" rows="4" required
-                class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-[#521C0D] focus:outline-none focus:border-[#D5451B] text-sm"></textarea>
+                class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-black focus:outline-none focus:border-[#D5451B] text-sm"></textarea>
             </div>
 
             <input type="hidden" name="_redirect" value="thanks.html">
             <div class="text-center">
               <button type="submit"
-                class="bg-[#D5451B] text-white font-semibold px-6 py-2 rounded-md hover:bg-[#FF9B45] transition text-sm">
+                class="bg-[#D5451B] text-white px-6 py-2 rounded-md hover:bg-[#FF9B45] transition text-sm">
                 Send Message
               </button>
             </div>

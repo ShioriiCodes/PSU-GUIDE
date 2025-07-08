@@ -6,6 +6,7 @@
   <title>Registrar Moderator Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/png">
 </head>
 <body class="bg-[#F4E7E1] font-poppins">
   <div class="min-h-screen flex">
