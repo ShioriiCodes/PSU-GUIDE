@@ -1,9 +1,12 @@
+  // Handle tab switching in profile
   function showTab(tabId, element = null) {
-    // 1. Show selected content tab
+    // 1. Hide all tabs
     document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+
+    // 2. Show selected tab
     document.getElementById(tabId).classList.remove('hidden');
 
-    // 2. Highlight active button (skip if Logout)
+    // 3. Highlight selected button unless it's logout
     if (element) {
       const buttons = document.querySelectorAll('#sidebarNav button');
       buttons.forEach(btn => {
@@ -18,18 +21,22 @@
     }
   }
 
-  // 3. Default to Personal Info on page load
+  // Default to Personal Info on page load
   window.addEventListener('DOMContentLoaded', () => {
-    const defaultBtn = document.querySelector('#sidebarNav button:nth-child(1)');
-    showTab('personal', defaultBtn);
+    const defaultBtn = document.querySelector('#sidebarNav button[data-tab="personal"]');
+    if (defaultBtn) {
+      showTab('personal', defaultBtn);
+    }
   });
 
-  // Optional: Profile image preview
+  // Profile picture preview
   function previewImage(event) {
     const reader = new FileReader();
-    reader.onload = function() {
+    reader.onload = function () {
       const output = document.getElementById('profilePreview');
-      output.src = reader.result;
+      if (output) {
+        output.src = reader.result;
+      }
     };
     reader.readAsDataURL(event.target.files[0]);
   }

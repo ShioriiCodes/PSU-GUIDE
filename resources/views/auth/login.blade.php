@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Login Page Section -->
-    <section class="bg-[#101010] py-16 min-h-screen font-[Poppins] flex items-center justify-center">
+    <section class="bg-[#e4e4e4] py-16 min-h-screen font-[Poppins] flex items-center justify-center">
       <div class="container mx-auto px-4 sm:px-6 max-w-md">
         <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-[#fec08a]">
           

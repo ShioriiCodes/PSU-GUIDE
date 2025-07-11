@@ -13,7 +13,7 @@ class UserSetupController extends Controller
         {
             // Remove existing accounts to avoid conflicts
             User::whereIn('email', [
-                'admin@example.com',
+                'psuguide.info@gmail.com',
                 'registrar@example.com',
                 'usg@example.com',
             ])->delete();
@@ -21,7 +21,7 @@ class UserSetupController extends Controller
             // Re-create users with proper bcrypt hashes
             User::create([
                 'name' => 'Admin',
-                'email' => 'admin@example.com',
+                'email' => 'psuguide.info@gmail.com',
                 'password' => Hash::make('password123'),
                 'role' => 'admin',
             ]);

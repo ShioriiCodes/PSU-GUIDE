@@ -12,7 +12,7 @@ class CategorySeeder extends Seeder
         $categories = [
             'USG Posts',
             'Academic Calendar',
-            'University Employee Directory',
+            'Faculty Meetings & Assemblies',
             'Campus Events',
             'Workshops & Seminars',
             'Social Gatherings',

@@ -47,6 +47,7 @@ class AnnouncementController extends Controller
     // ✅ Add this to handle announcement posting
     public function store(Request $request)
     {
+        // Validate incoming request
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -56,12 +57,12 @@ class AnnouncementController extends Controller
         $user = Auth::user();
         $category = Category::find($request->category_id);
 
-        // In store()
+        // Handle role-based posting permissions
         if ($user->role === 'admin') {
             $isApproved = true; // Admin can post anything
         } elseif ($user->role === 'registrar') {
-            if (!in_array($category->name, ['Academic Calendar', 'University Employee Directory'])) {
-                return back()->with('error', 'Registrar can only post academic and directory announcements.');
+            if (!in_array($category->name, ['Academic Calendar', 'Faculty Meetings & Assemblies'])) {
+                return back()->with('error', 'Registrar can only post academic or meeting-related announcements.');
             }
             $isApproved = true;
         } elseif ($user->role === 'usg') {
@@ -73,6 +74,7 @@ class AnnouncementController extends Controller
             return back()->with('error', 'Unauthorized to post announcements.');
         }
 
+        // Save the announcement
         Announcement::create([
             'title'       => $request->title,
             'content'     => $request->content,
@@ -83,4 +85,5 @@ class AnnouncementController extends Controller
 
         return back()->with('success', 'Announcement posted successfully.');
     }
+
 }

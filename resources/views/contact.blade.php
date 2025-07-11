@@ -21,23 +21,23 @@
 
           <div class="text-black mt-6 space-y-4 text-sm sm:text-base">
             <div class="flex items-start gap-2">
-              <img src="{{asset('image/icon/location.png')}}" alt="Location Icon" class="w-6 h-6 mt-1">
+              <img src="{{asset('image/icon/location.png')}}" alt="Location Icon" class="w-7 h-7 mt-1">
               <span><strong>Location:</strong> Palawan State University – Quezon Campus</span>
             </div>
             <div class="flex items-start gap-2">
-              <img src="{{asset('image/icon/email.png')}}" alt="Email Icon" class="w-6 h-6 mt-1">
-              <span><strong>Email:</strong> psuguide@gmail.com</span>
+              <img src="{{asset('image/icon/email.png')}}" alt="Email Icon" class="w-7 h-7 mt-1">
+              <span><strong>Email:</strong> psuguide.info@gmail.com</span>
             </div>
             <div class="flex items-start gap-2">
-              <img src="{{asset('image/icon/phone.png')}}" alt="Phone Icon" class="w-6 h-6 mt-1">
+              <img src="{{asset('image/icon/phone.png')}}" alt="Phone Icon" class="w-7 h-7 mt-1">
               <span><strong>Phone:</strong> +63 912 345 6789</span>
             </div>
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
               <a href="https://facebook.com/psuquezon" target="_blank" class="flex items-center gap-2 hover:underline">
-                <img src="{{asset('image/icon/facebook.png')}}" alt="Facebook Icon" class="w-6 h-6"> Facebook
+                <img src="{{asset('image/icon/facebook.png')}}" alt="Facebook Icon" class="w-7 h-7"> Facebook
               </a>
-              <a href="mailto:psuguide@gmail.com" class="flex items-center gap-2 hover:underline">
-                <img src="{{asset('image/icon/gmail.png')}}" alt="Gmail Icon" class="w-6 h-6"> Email Us
+              <a href="mailto:psuguide.info@gmail.com" class="flex items-center gap-2 hover:underline">
+                <img src="{{asset('image/icon/gmail.png')}}" alt="Gmail Icon" class="w-7 h-7"> Email Us
               </a>
             </div>
           </div>
@@ -45,12 +45,18 @@
 
         <!-- Contact Form (Right Side) -->
         <div class="w-full lg:w-[40%] max-w-md bg-white shadow-md rounded-lg p-6 mx-auto lg:mx-0">
+          @if (session('success'))
+            <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4 text-sm">
+              {{ session('success') }}
+            </div>
+          @endif
           <div class="text-center mb-8">
             <h1 class="text-2xl sm:text-3xl font-bold text-black mb-2">Contact Us</h1>
             <p class="text-black text-sm">Got questions or feedback? Reach out and we’ll get back to you.</p>
           </div>
 
-          <form action="send-contact.php" method="POST" class="space-y-5">
+          <form action="{{ route('contact.send') }}" method="POST" class="space-y-5">
+            @csrf
             <div>
               <label class="block text-black font-semibold mb-1 text-sm">Full Name</label>
               <input type="text" name="name" required
@@ -67,7 +73,6 @@
                 class="w-full px-3 py-2 border border-[#FF9B45] rounded-md bg-[#F4E7E1] text-black focus:outline-none focus:border-[#D5451B] text-sm"></textarea>
             </div>
 
-            <input type="hidden" name="_redirect" value="thanks.html">
             <div class="text-center">
               <button type="submit"
                 class="bg-[#D5451B] text-white px-6 py-2 rounded-md hover:bg-[#FF9B45] transition text-sm">
@@ -77,10 +82,12 @@
           </form>
 
           <div class="text-center mt-8 text-xs text-[#521C0D]">
-            <p>Email us directly at <a href="mailto:psuguide@gmail.com" class="underline text-[#D5451B]">psuguide@gmail.com</a></p>
+            <p>Email us directly at <a href="https://mail.google.com/mail/?view=cm&fs=1&to=psuguide.info@gmail.com" target="_blank" rel="noopener" class="underline text-[#D5451B] hover:text-[#FF9B45] transition">
+              psuguide.info@gmail.com</a>
+            </p>
           </div>
         </div>
       </div>
     </section>
     
- @endsection
+@endsection

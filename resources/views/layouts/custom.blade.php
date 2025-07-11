@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
+      @if(auth()->check() && auth()->user()->theme === 'dark') class="dark" @endif>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,9 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/png">
+    <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/x-icon">
 </head>
-<body class="bg-[#dddddd] text-[#521C0D]">
+<body class="bg-[#e6e6e6] text-[#521C0D]">
     <!-- Navbar -->
     <nav class="bg-[#ffffff] text-black p-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center w-full">
@@ -64,7 +65,7 @@
                         <hr class="my-2">
 
                         <ul class="space-y-2 text-sm">
-                            <li><a href="{{ route('profile.edit') }}" class="block hover:text-[#F15B24]">Profile</a></li>
+                            <li><a href="{{ route('user.profile') }}" class="block hover:text-[#F15B24]">Profile</a></li>
                             <li><a href="#" class="block hover:text-[#F15B24]">Notifications</a></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
@@ -85,7 +86,8 @@
     <!-- Footer -->
     <footer class="bg-[#F15B24] text-white text-center px-4 py-6 text-sm sm:text-base">
         <p>&copy; 2025 PSU-GUIDE | Palawan State University Quezon Campus</p>
-        <p>Contact: <a href="mailto:psuguide@gmail.com" class="underline hover:text-[#FF9B45]">psuguide@gmail.com</a></p>
+        <p>Contact: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=psuguide.info@gmail.com" target="_blank" rel="noopener" class="underline hover:text-[#FF9B45] transition">
+            psuguide.info@gmail.com</a></p>
     </footer>
 
     <script src="{{ asset('js/script.js') }}"></script>

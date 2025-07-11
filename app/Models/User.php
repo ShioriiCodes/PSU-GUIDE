@@ -20,8 +20,13 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'student_number',
+        'profile_picture',
         'password',
-        'role', // ← this must be here
+        'role',
+        'theme', 
+        'language', // ← this must be here
+        'notification_settings',
     ];
 
     /**
@@ -46,6 +51,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    protected $casts = [
+    'notification_settings' => 'array', // ✅ Casts JSON to PHP array
+];
 
     public function department()
     {

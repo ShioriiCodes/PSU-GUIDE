@@ -10,7 +10,7 @@
       <!-- Dark Overlay -->
       <div class="absolute inset-0 bg-[#F4E7E1]/60"></div>
       <!-- Content -->
-      <div class="relative z-10 container mx-auto px-6 sm:px-10 flex flex-col md:flex-row items-center max-w-[1400px]">
+      <div class="relative z-10 container mx-auto px-6 mt-[-50px] sm:px-10 flex flex-col md:flex-row items-center max-w-[1400px]">
 
         <!-- Left: Text + Buttons -->
         <div class="md:w-1/2 text-center md:text-left mb-12 md:mb-0">
@@ -39,7 +39,7 @@
 
         <!-- Right: Logo -->
         <div class="md:w-1/2 flex justify-center">
-          <img src="{{ asset('logo/PSU_Logo.png') }}" alt="PSU Logo Campus" class="w-4/5 max-w-xs sm:max-w-sm md:max-w-md rounded-lg">
+          <img src="{{ asset('logo/PSU_Logo.png') }}" alt="PSU Logo Campus" class="w-4/5 max-w-xs sm:max-w-sm md:max-w-md rounded-lg mt-[-40px] sm:mt-0 shadow-lg">
         </div>
       </div>
     </section>

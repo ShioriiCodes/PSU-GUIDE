@@ -8,10 +8,11 @@
   <!-- ABOUT PAGE -->
   <section class="bg-[#F4E7E1] text-black px-4 sm:px-6 py-20">
     <!-- Page Header -->
+    
     <div class="max-w-[1400px] mx-auto text-center mb-12">
       <h1 class="text-3xl sm:text-4xl font-bold mb-4">What is PSU-GUIDE?</h1>
       <p class="text-base sm:text-lg">
-        Your all-in-one information portal for PSU Quezon Campus — made by students, for students.
+        Your all-in-one information portal for PSU Quezon Campus — made by students, for students and faculties.
       </p>
     </div>
 
@@ -33,6 +34,26 @@
         <li>Guest users can still view general announcements</li>
         <li>Ensures clarity, accuracy, and faster student communication</li>
       </ul>
+    </div>
+      <!-- Mission and Vision Section -->
+    <div class="max-w-5xl mx-auto mb-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Mission -->
+      <div class="bg-white shadow-md rounded-lg p-8 border-l-4 border-[#f15b24ec]">
+        <h2 class="text-xl font-bold text-[#521C0D] mb-4">Our Mission</h2>
+        <p class="text-sm sm:text-base leading-relaxed text-gray-700">
+          To provide a centralized, reliable, and user-friendly platform that delivers timely and verified announcements for
+          the Palawan State University Quezon Campus community — ensuring transparency, accessibility, and improved student engagement.
+        </p>
+      </div>
+
+      <!-- Vision -->
+      <div class="bg-white shadow-md rounded-lg p-6 border-l-4 border-[#FF9B45]">
+        <h2 class="text-xl font-bold text-[#521C0D] mb-4">Our Vision</h2>
+        <p class="text-sm sm:text-base leading-relaxed text-gray-700">
+          To become the university’s trusted digital bulletin — fostering informed decision-making, streamlined communication,
+          and a connected academic environment through modern web technologies.
+        </p>
+      </div>
     </div>
 
     <!-- Feature Cards -->

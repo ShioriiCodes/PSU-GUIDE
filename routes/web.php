@@ -1,22 +1,32 @@
 <?php
-
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserSetupController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminImportController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Models\User;
-use App\Http\Controllers\StudentController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LogoutController;
 
 
-// Profile routes
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+// User Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+    Route::put('/profile/update', [UserController::class, 'update'])->name('user.update')->middleware('auth');
+    Route::put('/user/update-password', [UserController::class, 'updatePassword'])->name('user.updatePassword');
+    Route::post('/login/custom', [LoginController::class, 'authenticate'])->name('login.custom');
+    Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+    Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+    Route::put('/profile/update', [UserController::class, 'update'])->name('user.update');  
+    Route::put('/profile/preferences', [UserController::class, 'updatePreferences'])->name('user.preferences.update');
+    
+
 });
 
 require __DIR__.'/auth.php';
@@ -67,13 +77,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Student Routes
-Route::middleware(['auth'])->prefix('students')->group(function () {
-    Route::get('/{id}', [StudentController::class, 'show'])->name('students.show');
-    Route::get('/{id}/edit', [StudentController::class, 'edit'])->name('students.edit');
-    Route::post('/{id}/toggle-status', [StudentController::class, 'toggleStatus'])->name('students.toggleStatus');
-    Route::delete('/{id}', [StudentController::class, 'destroy'])->name('students.destroy');
-    Route::post('/{id}/export', [StudentController::class, 'export'])->name('students.export');
-});
 
 // Dashboard Route (Smart Redirection Based on Role)
 Route::middleware(['auth'])->get('/dashboard', function () {
@@ -92,3 +95,5 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.store');
+
+Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
