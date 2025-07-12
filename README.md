@@ -26,7 +26,7 @@
 
 - **HTML5**
 - **Tailwind CSS**
-- **Vanilla JavaScript**
+- **JavaScript**
 - Responsive design techniques
 - Google Maps Embed API
 
