@@ -15,8 +15,8 @@
         <div class="flex-shrink-0 text-center">
             @if ($faculty->profile_picture)
                 <img src="{{ asset('storage/' . $faculty->profile_picture) }}"
-                     alt="Profile Picture"
-                     class="w-40 h-40 rounded-full object-cover border shadow">
+                    alt="Profile Picture"
+                    class="w-40 h-40 rounded-full object-cover border shadow">
             @else
                 <div class="w-40 h-40 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
                     No Image
@@ -58,10 +58,12 @@
             <button type="submit" name="format" value="excel" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
                 Download Excel
             </button>
-            <button type="submit" name="format" value="json" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
-                Download JSON
+            <button type="submit" name="format" value="txt" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
+                Download TXT
             </button>
         </form>
+
+
     </div>
 </div>
 @endsection

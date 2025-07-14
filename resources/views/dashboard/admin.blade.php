@@ -53,6 +53,18 @@
                 {{ session('error') }}
             </div>
         @endif
+
+        <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center hidden z-50">
+            <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                <h2 class="text-xl font-bold text-red-600 mb-4">Confirm Deletion</h2>
+                <p class="text-gray-700 mb-6">Are you sure you want to delete <span id="deleteTargetName" class="font-semibold"></span>?</p>
+
+                <div class="flex justify-end gap-4">
+                    <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">Cancel</button>
+                    <button onclick="submitDeleteForm()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
+                </div>
+            </div>
+        </div>
         <!-- Dashboard Panel -->
         <section id="dashboard" class="panel">
             <h1 class="text-2xl font-bold mb-6">Website Statistics</h1>
@@ -170,7 +182,7 @@
                 </div>
                 <!-- Approval -->
                 <div class="flex items-center space-x-2">
-                    <input type="checkbox" name="is_approved" id="is_approved" class="rounded border-gray-300 text-[#FF9B45] focus:ring-[#FF9B45]">
+                    <input type="checkbox" name="is_approved" id="is_approved" class="rounded border-gray-300 text-[#FF9B45] focus:ring-[#FF9B45]" required>
                     <label for="is_approved" class="text-sm text-gray-700">Mark as Approved</label>
                 </div>
                 <!-- Submit -->
@@ -332,8 +344,7 @@
                                 </td>
                                 <td class="px-6 py-4 space-x-2">
                                     <!-- View -->
-                                    <a href="{{ route('students.show', $mod->id) }}" class="text-blue-600 hover:underline">View</a>
-
+                                    <a href="{{ route('moderators.show', $mod->id) }}" class="text-blue-600 hover:underline">View</a>
                                     <!-- Toggle Status -->
                                     <form method="POST" action="{{ route('students.toggleStatus', $mod->id) }}" class="inline">
                                         @csrf
@@ -341,7 +352,6 @@
                                             {{ $mod->status === 'active' ? 'Disable' : 'Activate' }}
                                         </button>
                                     </form>
-
                                     <!-- Delete -->
                                 <form method="POST"
                                     action="{{ route('accounts.destroy', $mod->id) }}"
@@ -495,123 +505,108 @@
         </div>
     </section>
 
-
         <!-- Faculty Accounts Panel -->
-    <section id="faculty" class="panel hidden">
-        <h1 class="text-2xl font-bold mb-6">Faculty Accounts</h1>
-        <!-- Search + Action Buttons -->
-        <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <input type="text" placeholder="Search faculty..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded">
-            <div class="flex gap-2">
-                <button onclick="toggleImportFacultyForm()" class="px-4 py-2 bg-[#E17C5F] text-white rounded">Import Faculty</button>
-                <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Faculty</button>
+        <section id="faculty" class="panel hidden">
+            <h1 class="text-2xl font-bold mb-6">Faculty Accounts</h1>
+
+            <!-- Search + Action Buttons -->
+            <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <input type="text" placeholder="Search faculty..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded">
+                <div class="flex gap-2">
+                    <button onclick="toggleImportFacultyForm()" class="px-4 py-2 bg-[#E17C5F] text-white rounded">Import Faculty</button>
+                    <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Faculty</button>
+                </div>
             </div>
-        </div>
-                
-        <!-- Faculty Table -->
-        <div class="bg-white rounded shadow overflow-x-auto mb-6">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Department</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Created</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse ($faculty as $prof)
-                    <tr>
-                        <td class="px-6 py-4">{{ $prof->name }}</td>
-                        <td class="px-6 py-4">{{ $prof->email }}</td>
-                        <td class="px-6 py-4">{{ $prof->department->name ?? 'N/A' }}</td>
 
-                        <!-- Status -->
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 text-xs rounded {{ $prof->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                                {{ ucfirst($prof->status ?? 'inactive') }}
-                            </span>
-                        </td>
-
-                        <!-- Created At -->
-                        <td class="px-6 py-4 text-sm text-gray-500">
-                            {{ $prof->created_at ? $prof->created_at->diffForHumans() : 'N/A' }}
-                        </td>
-
-                        <!-- Actions -->
-                        <td class="px-6 py-4 space-x-2">
-                            <a href="{{ route('faculty.show', $prof->id) }}" class="text-blue-600 hover:underline">View</a>
-
-                            <!-- Toggle Active/Inactive -->
-                            <form method="POST" action="{{ route('students.toggleStatus', $prof->id) }}" class="inline">
-                                @csrf
-                                <button type="submit" class="{{ $prof->status === 'active' ? 'text-yellow-600' : 'text-green-600' }} hover:underline">
-                                    {{ $prof->status === 'active' ? 'Disable' : 'Activate' }}
-                                </button>
-                            </form>
-
-                            <!-- Delete -->
-                            <form method="POST"
-                                action="{{ route('accounts.destroy', $prof->id) }}"
-                                class="inline delete-form"
-                                data-name="{{ $prof->name }}"
-                                data-panel="faculty"
-                                onsubmit="return showDeleteModal(event)">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    
-                    @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No faculty found.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            @if(session('success'))
-                <div id="alertSuccess" class="transition-opacity duration-1000 opacity-100 bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div id="alertError" class="transition-opacity duration-1000 opacity-100 bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-        </div>
-
-        <!-- Import Faculty Form -->
-        <div id="importFacultyForm" class="bg-white p-6 rounded shadow max-w-xl hidden mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Import Faculty</h2>
-                <button onclick="toggleImportFacultyForm()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">✕</button>
-            </div>
-            <form action="{{ route('admin.import.faculty') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                @csrf
-                <div>
-                    <label class="block text-sm font-medium">Choose Excel File</label>
-                    <input type="file" name="excelFile" accept=".xlsx" class="mt-2 w-full p-2 border border-gray-300 rounded" required>
-                </div>
-                <button type="submit" class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Upload and Import</button>
-            </form>
-            <p class="text-sm text-gray-500 mt-4">Faculty name, email, and password will be based on the email prefix. Department will be detected (e.g., BSIT, BSED).</p>
-        </div>
+            <!-- Session Success Message -->
             @if (session('faculty_success'))
-                <div class="alert alert-success">
+                <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
                     {{ session('faculty_success') }}
                 </div>
             @endif
-    </section>
 
-   <section id="settings" class="panel hidden">
-    <h1 class="text-2xl font-bold mb-6">Admin Settings</h1>
+            <!-- Faculty Table -->
+            <div class="bg-white rounded shadow overflow-x-auto mb-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Department</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Created</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse ($faculty as $prof)
+                            <tr>
+                                <td class="px-6 py-4">{{ $prof->name }}</td>
+                                <td class="px-6 py-4">{{ $prof->email }}</td>
+                                <td class="px-6 py-4">{{ $prof->department->name ?? 'N/A' }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 text-xs rounded {{ $prof->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                        {{ ucfirst($prof->status ?? 'inactive') }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500">
+                                    {{ $prof->created_at ? $prof->created_at->diffForHumans() : 'N/A' }}
+                                </td>
+                                <td class="px-6 py-4 space-x-2">
+                                    <a href="{{ route('faculty.show', $prof->id) }}" class="text-blue-600 hover:underline">View</a>
+
+                                    <!-- Toggle Active/Inactive -->
+                                    <form method="POST" action="{{ route('students.toggleStatus', $prof->id) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="{{ $prof->status === 'active' ? 'text-yellow-600' : 'text-green-600' }} hover:underline">
+                                            {{ $prof->status === 'active' ? 'Disable' : 'Activate' }}
+                                        </button>
+                                    </form>
+
+                                    <!-- Delete -->
+                                    <form method="POST"
+                                            action="{{ route('accounts.destroy', $prof->id) }}"
+                                            class="inline delete-form"
+                                            data-name="{{ $prof->name }}"
+                                            data-panel="faculty"
+                                            onsubmit="return showDeleteModal(event)">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No faculty found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Import Faculty Form -->
+            <div id="importFacultyForm" class="bg-white p-6 rounded shadow max-w-xl hidden mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Import Faculty</h2>
+                    <button onclick="toggleImportFacultyForm()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">✕</button>
+                </div>
+                <form action="{{ route('admin.import.faculty') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="block text-sm font-medium">Choose Excel File</label>
+                        <input type="file" name="excelFile" accept=".xlsx" class="mt-2 w-full p-2 border border-gray-300 rounded" required>
+                    </div>
+                    <button type="submit" class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Upload and Import</button>
+                </form>
+                <p class="text-sm text-gray-500 mt-4">
+                    Faculty name, email, and password will be based on the email prefix. Department will be detected (e.g., BSIT, BSED).
+                </p>
+            </div>
+        </section>
+
+    <section id="settings" class="panel hidden">
+        <h1 class="text-2xl font-bold mb-6">Admin Settings</h1>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl">
             <!-- LEFT: Profile Info -->
@@ -704,9 +699,28 @@
         </div>
     </section>
 
-     <section id="activityLogs" class="panel hidden">
-            <h1 class="text-2xl font-bold mb-6">Activity Logs</h1>
+    {{-- Activity Panel --}}
+    <section id="activityLogs" class="panel hidden">
+        <h1 class="text-2xl font-bold mb-6">Activity Logs</h1>
             <p class="text-gray-700 mb-4">Track recent activities and system changes performed by users and moderators.</p>
+            <div class="flex items-center justify-end gap-2 px-4 pb-4">
+                <a href="{{ route('activityLogs.export', 'pdf') }}" target="_blank"
+                    class="inline-block px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition">
+                    Download PDF
+                </a>
+                <a href="{{ route('activityLogs.export', 'docx') }}" target="_blank"
+                    class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
+                    Download DOCX
+                </a>
+                <a href="{{ route('activityLogs.export', 'excel') }}" target="_blank"
+                    class="inline-block px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">
+                    Download Excel
+                </a>
+                <a href="{{ route('activityLogs.export', 'txt') }}" target="_blank"
+                    class="inline-block px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition">
+                    Download TXT
+                </a>
+            </div>
             <div class="bg-white shadow rounded overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-100">
@@ -717,41 +731,61 @@
                         <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Role</th>
                     </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                       @foreach ($logs as $log)
-                            <tr>
-                                <td>{{ $log->timestamp }}</td>
-                                <td>{{ $log->user->name ?? 'Guest' }}</td>
-                                <td>{{ $log->action }}</td>
-                                <td>
-                                    @if ($log->target)
-                                        {{ class_basename($log->target_type) }}: 
-                                        {{ $log->target->title ?? $log->target->name ?? 'Untitled' }}
+                    <tbody class="bg-white divide-y divide-gray-100 text-sm text-gray-700">
+                        @forelse ($logs as $log)
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-2 whitespace-nowrap text-gray-700">
+                                    {{ \Carbon\Carbon::parse($log->timestamp)->format('Y-m-d H:i') }}
+                                </td>
+
+                                <td class="px-6 py-2 font-medium text-gray-900">
+                                    {{ $log->user->name ?? 'Guest' }}
+                                    <span class="block text-xs text-gray-700">{{ ucfirst($log->user->role ?? 'guest') }}</span>
+                                </td>
+
+                                <td class="px-6 py-2">
+                                    <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                                        {{ ucfirst($log->action) }}
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-2 text-gray-700">
+                                    @php
+                                        $target = $log->target;
+                                    @endphp
+
+                                    @if ($target)
+                                        <div class="text-sm">
+                                            <span class="font-semibold">{{ class_basename($log->target_type) }}</span>
+                                            @if (optional($target)->title)
+                                                — “{{ Str::limit($target->title, 30) }}”
+                                            @elseif (optional($target)->name)
+                                                — {{ $target->name }}
+                                            @endif
+                                        </div>
+                                    @elseif (is_null($log->target_type))
+                                        <span class="text-gray-700 italic">System event (login/logout)</span>
                                     @else
-                                        No related 
+                                        <span class="text-gray-700 italic">No related record</span>
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-2 text-center text-gray-500">
+                                    No activity logs found.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-        </section>
+    </section>
+
     </main>
 
 </div>
 
-    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-            <h2 class="text-xl font-bold text-red-600 mb-4">Confirm Deletion</h2>
-            <p class="text-gray-700 mb-6">Are you sure you want to delete <span id="deleteTargetName" class="font-semibold"></span>?</p>
-
-            <div class="flex justify-end gap-4">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">Cancel</button>
-                <button onclick="submitDeleteForm()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         function previewProfileImage(input) {
@@ -808,17 +842,22 @@
             window.addEventListener('DOMContentLoaded', () => {
         const successAlert = document.getElementById('alertSuccess');
         const errorAlert = document.getElementById('alertError');
-
-        [successAlert, errorAlert].forEach(alert => {
-        if (alert) {
-            setTimeout(() => {
-            alert.classList.add('opacity-0');
-            setTimeout(() => alert.remove(), 1000); // remove after fade
-            }, 3000); // visible for 3s
-        }
+        [
+            successAlert, errorAlert].forEach(alert => {
+                if (alert) {
+                    setTimeout(() => {
+                    alert.classList.add('opacity-0');
+                    setTimeout(() => alert.remove(), 1000); // remove after fade
+                    }, 3000); // visible for 3s
+                }
+            });
         });
-    });
-        </script>
+
+        function toggleImportFacultyForm() {
+            const form = document.getElementById('importFacultyForm');
+            form.classList.toggle('hidden');
+        }
+    </script>
         <script src="//unpkg.com/alpinejs" defer></script>
         <script src="{{ asset('js/admin.js') }}"></script>
 </body>

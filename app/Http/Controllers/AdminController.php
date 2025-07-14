@@ -49,12 +49,15 @@ class AdminController extends Controller
 
         $user->name = $request->input('name');
         $user->email = $request->input('email');
+        $user =Auth::user();
 
-        $user->save();
+        // ✅ Log the update (ensure ActivityLogger exists and is working)
+        if (class_exists(\App\Helpers\ActivityLogger::class)) {
+            \App\Helpers\ActivityLogger::log('update_profile (admin)', get_class($user), $user->id);
+        }
 
         return back()->with('success', 'Profile updated successfully.');
     }
-
 
 
 }

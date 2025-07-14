@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use App\Models\SiteAnalytics;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,23 +26,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        app()->terminating(function () {
-            if (
-                Schema::hasTable('site_analytics') &&
-                Session::has('visit_start') &&
-                Session::has('visit_id')
-            ) {
-                $start = Session::get('visit_start');
-                $duration = now()->diffInSeconds($start);
-
-                \App\Models\SiteAnalytics::where('id', Session::get('visit_id'))->update([
-                    'duration' => $duration
-                ]);
-
-                Session::forget(['visit_start', 'visit_id']);
-            }
-        });
-        
+        Relation::morphMap([
+        'user' => \App\Models\User::class,
+        'announcement' => \App\Models\Announcement::class,
+        // Add other mappings if needed
+    ]);
     }
     
 }

@@ -24,14 +24,7 @@ class User extends Authenticatable
         'profile_picture',
         'password',
         'role',
-        // 'theme', 
-        // 'language', // ← this must be here
         'notification_settings',
-        'target_id',
-        'user_id',
-        'action',
-        'target_type',
-        'timestamp',
         'department_id',
 
     ];

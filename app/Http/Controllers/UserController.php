@@ -46,7 +46,7 @@ class UserController extends Controller
         $user->save();
 
         // ✅ Log the profile update
-        ActivityLogger::log('update_profile', 'User', $user->id);
+        ActivityLogger::log('update_profile', get_class($user), $user->id);
 
         return back()->with('success', 'Profile updated successfully!');
     }
@@ -65,20 +65,19 @@ class UserController extends Controller
             }
 
             $user->password = bcrypt($request->new_password);
-            $user->save();
+            $user= Auth::user();
 
-            // ✅Optional: log activity
-            if (class_exists(\App\Helpers\ActivityLogger::class)) {
-                \App\Helpers\ActivityLogger::log('change_password', 'User', $user->id);
-            }
+            // ✅ Correct dynamic class reference
+            \App\Helpers\ActivityLogger::log('change_password', get_class($user), $user->id);
 
             return back()->with('success_password', 'Password updated successfully!');
         }
 
+
         public function updatePreferences(Request $request)
         {
                 $request->validate([
-                    // 'language' => 'required|in:en,fil',
+
                     'notifications' => 'array',
                     'notifications.*' => 'in:email,sms',
                 ]);

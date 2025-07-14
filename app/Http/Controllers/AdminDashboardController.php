@@ -97,7 +97,9 @@ class AdminDashboardController extends Controller
             ->get()
             ->keyBy('date');
 
-        $logs = ActivityLog::with(['user', 'target'])->latest()->take(50)->get();
+        $logs = ActivityLog::with('user', 'target')
+            ->orderByDesc('timestamp') // or ->latest('timestamp')
+            ->get();
 
         return view('dashboard.admin', compact(
             'pendingAnnouncements',

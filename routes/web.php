@@ -13,6 +13,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ModeratorController;
 
 // User Routes
 Route::middleware(['auth'])->group(function () {
@@ -26,9 +27,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Static Pages
 Route::get('/', function () {
@@ -63,7 +61,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
     Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
 
-
 });
 
 // Registrar and USG Routes
@@ -81,11 +78,18 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard.usg');
 });
 
+
+Route::get('/activity-logs/export/{format}', [ActivityLogController::class, 'export'])->name('activityLogs.export');
+
 // Setup Users (for testing or initial setup)
 Route::get('/setup-users', [UserSetupController::class, 'insertTestUsers']);
 
 // Faculty Export Route
 Route::post('/faculty/{id}/export', [FacultyController::class, 'export'])->name('faculty.export');
+// mods
+Route::get('/moderators/{id}', [ModeratorController::class, 'show'])->name('moderators.show');
+Route::post('/moderators/{id}/export', [ModeratorController::class, 'export'])->name('moderators.export');
+;
 
 // Faculty Routes
 Route::middleware(['auth'])->group(function () {
@@ -96,7 +100,7 @@ Route::middleware(['auth'])->group(function () {
     // Edit student
     Route::get('/students/{id}/edit', [StudentController::class, 'edit'])->name('students.edit');
 
-    // Export formats (JSON, Excel)
+    // Export formats (JSON, Excel, pdf)
     Route::get('/students/{id}/export', [StudentController::class, 'export'])->name('students.export');
 
     // Toggle active/inactive
