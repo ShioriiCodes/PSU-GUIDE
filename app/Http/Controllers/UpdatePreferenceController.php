@@ -23,4 +23,6 @@ class UpdatePreferenceController extends Controller
         return back()->with('success_preferences', 'Preferences updated successfully.');
     }
 
+    
+
 }

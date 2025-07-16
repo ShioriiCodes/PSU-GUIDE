@@ -42,7 +42,7 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-8 z-10">
-                @if(session('success'))
+        @if(session('success'))
             <div id="alertSuccess" class="transition-opacity duration-1000 opacity-100 bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
                 {{ session('success') }}
             </div>
@@ -98,7 +98,8 @@
         <h1 class="text-2xl font-bold mb-6">Pending Announcements</h1>
 
         <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <input type="text" placeholder="Search announcements..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded">
+            <input type="text" id="pendingSearch" placeholder="Search announcements..." 
+            class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterTableRows('pendingSearch', '#pending table tbody tr')">
         </div>
 
         <p class="text-gray-700 mb-4">Review and approve announcements submitted by moderators.</p>
@@ -113,45 +114,102 @@
                 <strong>Submitted at:</strong> {{ $announcement->created_at->format('F j, Y g:i A') }}
                 </p>
 
-                <div class="my-3 text-gray-800 whitespace-pre-line text-sm">
-                {{ \Illuminate\Support\Str::limit($announcement->content, 300) }}
+                <div class="my-3 text-gray-800 text-sm truncate max-w-full" style="max-width: 100%;">
+                    {{ \Illuminate\Support\Str::limit($announcement->content, 300) }}
                 </div>
 
                 <div class="mt-2">
-                <span class="inline-block px-3 py-1 text-xs font-semibold rounded 
-                    @if($announcement->status === 'approved')
-                    bg-green-100 text-green-800
-                    @elseif($announcement->status === 'rejected')
-                    bg-red-100 text-red-800
-                    @else
-                    bg-yellow-100 text-yellow-800
-                    @endif">
-                    {{ ucfirst($announcement->status) }}
-                </span>
+                    <span class="inline-block px-3 py-1 text-xs font-semibold rounded 
+                        @if($announcement->status === 'approved')
+                        bg-green-100 text-green-800
+                        @elseif($announcement->status === 'rejected')
+                        bg-red-100 text-red-800
+                        @else
+                        bg-yellow-100 text-yellow-800
+                        @endif">
+                        {{ ucfirst($announcement->status) }}
+                    </span>
                 </div>
 
                 @if ($announcement->status === 'pending')
-                <div class="flex gap-2 mt-4">
-                    <!-- Approve -->
-                    <form action="{{ route('announcement.approve', $announcement->id) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">Approve</button>
-                    </form>
+                    <div class="flex gap-2 mt-4">
+                        <!-- View Button -->
+                        <button onclick="showAnnouncementModal({{ $announcement->id }})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded">
+                            View
+                        </button>
 
-                    <!-- Reject -->
-                    <form action="{{ route('announcement.reject', $announcement->id) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded">Reject</button>
-                    </form>
-                </div>
+                        <!-- Approve -->
+                        <form action="{{ route('announcement.approve', $announcement->id) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">Approve</button>
+                        </form>
+
+                        <!-- Reject -->
+                        <form action="{{ route('announcement.reject', $announcement->id) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded">Reject</button>
+                        </form>
+                    </div>
                 @endif
             </div>
             @empty
             <p class="text-gray-500 col-span-full">No pending announcements available.</p>
             @endforelse
         </div>
+
+        <!-- Announcement View Modal -->
+        <div id="announcementModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 px-4">
+            <div class="bg-white p-8 rounded-2xl w-full max-w-4xl shadow-2xl relative overflow-hidden">
+                
+                <!-- Close Button -->
+                <button onclick="closeAnnouncementModal()" 
+                        class="absolute top-4 right-6 text-gray-400 hover:text-black text-3xl font-bold transition">
+                    &times;
+                </button>
+
+                <!-- Title -->
+                <h2 id="modalTitle" 
+                    class="text-2xl sm:text-3xl font-semibold text-gray-800 mb-4 leading-snug break-words">
+                    Announcement Title
+                </h2>
+
+                <!-- Content Box -->
+                <div class="max-h-[60vh] overflow-y-auto mb-6 pr-2">
+                    <p id="modalContent" 
+                    class="text-base sm:text-lg text-gray-700 whitespace-pre-line leading-relaxed break-words">
+                        Full content goes here...
+                    </p>
+                </div>
+
+                <!-- Footer Metadata -->
+                <div class="text-sm text-gray-600 border-t pt-4 space-y-1">
+                    <p><strong>Submitted at:</strong> <span id="modalCreatedAt"></span></p>
+                    <p><strong>Submitted by:</strong> <span id="modalSubmittedBy"></span></p>
+                </div>
+            </div>
+        </div>
+        <script>
+            const announcements = @json($pendingAnnouncements);
+
+            function showAnnouncementModal(id) {
+                const announcement = announcements.find(a => a.id === id);
+                if (!announcement) return;
+
+                document.getElementById('modalTitle').textContent = announcement.title;
+                document.getElementById('modalContent').textContent = announcement.content;
+                document.getElementById('modalCreatedAt').textContent = new Date(announcement.created_at).toLocaleString();
+                document.getElementById('modalSubmittedBy').textContent = announcement.user?.name ?? 'Unknown';
+
+                document.getElementById('announcementModal').classList.remove('hidden');
+                document.getElementById('announcementModal').classList.add('flex');
+            }
+
+            function closeAnnouncementModal() {
+                document.getElementById('announcementModal').classList.add('hidden');
+            }
+        </script>
     </section>
 
         <!--  Announcement Post Panel -->
@@ -198,7 +256,8 @@
         <section id="allPosts" class="panel hidden">
             <h1 class="text-2xl font-bold mb-6">All Announcements</h1>
             <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <input type="text" placeholder="Search moderators..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded">
+                <input type="text" id="allPostsSearch" placeholder="Search moderators..." 
+                class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterTableRows('allPostsSearch', '#allPosts table tbody tr')">
             </div>
             <div class="bg-white rounded shadow overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -254,8 +313,8 @@
         <section id="moderators" class="panel hidden">
             <h1 class="text-2xl font-bold mb-6">Manage Moderators</h1>
             <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <input type="text" placeholder="Search moderators..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded">
-
+                <input type="text" id="moderatorSearch" placeholder="Search moderators..." 
+                class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterTableRows('moderatorSearch', '#moderators table tbody tr')">
                 <!-- Add Moderator Button -->
                 <button id="addModeratorBtn" type="button" class="px-4 py-2 bg-[#E17C5F] text-white rounded">
                     Add Moderator
@@ -403,7 +462,8 @@
         <h1 class="text-2xl font-bold mb-6">Manage Students</h1>
         <!-- Toolbar -->
         <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <input type="text" placeholder="Search students..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded">
+            <input type="text" id="studentSearch" placeholder="Search students..." 
+            class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterTableRows('studentSearch', '#students table tbody tr')">
             <div class="flex gap-2">
                 <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Student</button>
                 <button onclick="toggleImportForm()" class="px-4 py-2 bg-[#E17C5F] text-white rounded">Import Students</button>
@@ -511,7 +571,8 @@
 
             <!-- Search + Action Buttons -->
             <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <input type="text" placeholder="Search faculty..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded">
+                <input type="text" id="facultySearch" placeholder="Search faculty..." 
+                class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterTableRows('facultySearch', '#faculty table tbody tr')">
                 <div class="flex gap-2">
                     <button onclick="toggleImportFacultyForm()" class="px-4 py-2 bg-[#E17C5F] text-white rounded">Import Faculty</button>
                     <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Faculty</button>
@@ -605,6 +666,7 @@
             </div>
         </section>
 
+    {{-- Admin settings --}}
     <section id="settings" class="panel hidden">
         <h1 class="text-2xl font-bold mb-6">Admin Settings</h1>
 
@@ -735,7 +797,7 @@
                         @forelse ($logs as $log)
                             <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-2 whitespace-nowrap text-gray-700">
-                                    {{ \Carbon\Carbon::parse($log->timestamp)->format('Y-m-d H:i') }}
+                                    {{ \Carbon\Carbon::parse($log->timestamp)->timezone('Asia/Manila')->format('Y-m-d H:i') }}
                                 </td>
 
                                 <td class="px-6 py-2 font-medium text-gray-900">
@@ -785,7 +847,6 @@
     </main>
 
 </div>
-
 
     <script>
         function previewProfileImage(input) {
@@ -857,6 +918,18 @@
             const form = document.getElementById('importFacultyForm');
             form.classList.toggle('hidden');
         }
+
+        function filterTableRows(inputId, rowSelector) {
+            const input = document.getElementById(inputId);
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll(rowSelector);
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(filter) ? '' : 'none';
+            });
+        }
+
     </script>
         <script src="//unpkg.com/alpinejs" defer></script>
         <script src="{{ asset('js/admin.js') }}"></script>

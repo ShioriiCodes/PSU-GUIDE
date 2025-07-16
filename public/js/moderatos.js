@@ -14,9 +14,8 @@ function showPanel(id) {
 
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-[#E17C5F]', 'text-white'));
       const activeBtn = document.getElementById('btn-' + id);
+      
       if (activeBtn) {
-        activeBtn.classList.add('bg-[#E17C5F]', 'text-white');
+      activeBtn.classList.add('bg-[#E17C5F]', 'text-white');
       }
     }
-
-    

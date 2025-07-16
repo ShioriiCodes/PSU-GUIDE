@@ -1,72 +1,91 @@
 @extends('layouts.custom')
 
 @section('content')
-<section class="container mx-auto px-4 sm:px-6 py-12 min-h-screen">
-  <h1 class="text-2xl sm:text-3xl md:text-4xl text-black font-bold text-center mb-8 font-poppins">Announcement</h1>
+    <section class="container mx-auto px-4 sm:px-6 py-12 min-h-screen">
+      <h1 class="text-3xl text-center font-bold mb-10">Announcements</h1>
 
-  <!-- Filter Buttons -->
-  <div class="flex flex-wrap gap-2 justify-center mb-8 max-w-[1400px] mx-auto">
-    <button data-filter="All" class="filter-btn px-4 py-2 border border-[#521C0D] rounded-md bg-[#D5451B] text-white font-medium transition">All</button>
-
-    @foreach ($categories as $category)
-      @guest
-        @if (in_array($category->name, ['Campus Events', 'Social Gatherings']))
-          <button data-filter="{{ $category->name }}" class="filter-btn px-4 py-2 border border-[#521C0D] rounded-md bg-white text-black transition">
+      {{-- Filter Buttons --}}
+      <div class="flex flex-wrap gap-2 justify-center mb-8">
+        <button data-filter="All" class="filter-btn px-4 py-2 bg-[#D5451B] border border-[#521C0D] text-white rounded">All</button>
+        @foreach ($categories as $category)
+          <button data-filter="{{ $category->name }}" class="filter-btn px-4 py-2 bg-white text-black border border-[#521C0D] rounded">
             {{ $category->name }}
           </button>
-        @endif
-      @else
-        <button data-filter="{{ $category->name }}" class="filter-btn px-4 py-2 border border-[#521C0D] rounded-md bg-white text-black transition">
-          {{ $category->name }}
-        </button>
-      @endguest
-    @endforeach
-  </div>
-
-  <!-- Announcement Cards Grid -->
-  <div id="announcement-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1400px] mx-auto">
-    @forelse ($announcements as $announcement)
-      <div data-category="{{ optional($announcement->category)->name ?? '—' }}"
-        class="announcement-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-        <h3 class="text-lg sm:text-xl font-bold mb-2 text-black flex items-center gap-2">
-          @if(optional($announcement->category)->name)
-            <img src="{{ asset('image/icon/' . strtolower(optional($announcement->category)->name) . '.png') }}"
-                alt="{{ optional($announcement->category)->name }} Icon" class="w-9 h-9">
-          @else
-            <img src="{{ asset('image/icon/default.png') }}" alt="Default Icon" class="w-9 h-9">
-          @endif
-          {{ $announcement->title }}
-        </h3>
-        <p class="text-sm text-[#777777] mb-2">
-          Posted: {{ $announcement->created_at->format('F j, Y') }} • 
-          {{ $announcement->user ? ucfirst($announcement->user->role) : 'Unknown User' }}
-        </p>
-        <p class="text-sm text-[#1E1E1E] mb-3 line-clamp-4">
-          {{ Str::limit($announcement->content, 120) }}
-        </p>
-        <span class="inline-block bg-[#FF9B45] text-white text-xs px-3 py-1 rounded-md">
-          {{ optional($announcement->category)->name ?? '—' }}
-        </span>
+        @endforeach
       </div>
-    @empty
-      <p class="text-center text-gray-500 col-span-full">No announcements available.</p>
-    @endforelse
-  </div>
-</section>
 
-<!-- Filter Script -->
-<script>
-  document.querySelectorAll('.filter-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const filter = button.getAttribute('data-filter');
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('bg-[#D5451B]', 'text-white'));
-      button.classList.add('bg-[#D5451B]', 'text-white');
+      {{-- Announcements Grid --}}
+      <div id="announcement-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @forelse ($announcements as $announcement)
+        <div class="announcement-card bg-white p-6 rounded-xl shadow relative" data-category="{{ optional($announcement->category)->name }}">
+          <h2 class="text-xl font-bold flex items-center gap-2">
+            @if($announcement->category)
+              <img src="{{ asset('image/icon/' . strtolower($announcement->category->name) . '.png') }}" class="w-6 h-6" />
+            @endif
+            {{ $announcement->title }}
+          </h2>
 
-      document.querySelectorAll('.announcement-card').forEach(card => {
-        const category = card.getAttribute('data-category');
-        card.style.display = (filter === 'All' || category === filter) ? 'block' : 'none';
+          <p class="text-sm text-gray-600 mb-2">
+            Posted: {{ $announcement->created_at->format('F j, Y') }} • {{ ucfirst($announcement->user->role) ?? 'Unknown' }}
+          </p>
+
+          <p class="text-gray-800 mb-3">{{ Str::limit($announcement->content, 120) }}</p>
+          <span class="inline-block text-xs px-3 py-1 bg-[#FF9B45] text-white rounded">
+            {{ optional($announcement->category)->name ?? 'Uncategorized' }}
+          </span>
+
+          {{-- Comment Count --}}
+          <button onclick="openCommentsModal({{ $announcement->id }})"
+            class="mt-4 block text-sm text-blue-600 underline">
+            {{ $announcement->comments->count() }} comment{{ $announcement->comments->count() !== 1 ? 's' : '' }}
+          </button>
+        </div>
+        @empty
+        <p class="text-center text-gray-500 col-span-full">No announcements found.</p>
+        @endforelse
+      </div>
+    </section>
+
+    {{-- MODAL --}}
+    <div id="commentModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl h-[90vh] overflow-y-auto p-6 relative">
+        <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-600 text-xl hover:text-red-500">&times;</button>
+        <div id="modalContent">
+          <p class="text-center text-gray-500">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    {{-- JS --}}
+    <script>
+      document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const filter = button.getAttribute('data-filter');
+          document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('bg-[#D5451B]', 'text-white'));
+          button.classList.add('bg-[#D5451B]', 'text-white');
+
+          document.querySelectorAll('.announcement-card').forEach(card => {
+            const category = card.getAttribute('data-category');
+            card.style.display = (filter === 'All' || category === filter) ? 'block' : 'none';
+          });
+        });
       });
-    });
-  });
-</script>
+
+      function openCommentsModal(announcementId) {
+        const modal = document.getElementById('commentModal');
+        const content = document.getElementById('modalContent');
+        modal.classList.remove('hidden');
+        content.innerHTML = 'Loading...';
+
+        fetch(`/announcement/${announcementId}/comments`)
+          .then(res => res.text())
+          .then(html => {
+            content.innerHTML = html;
+          });
+      }
+
+      function closeModal() {
+        document.getElementById('commentModal').classList.add('hidden');
+      }
+    </script>
 @endsection

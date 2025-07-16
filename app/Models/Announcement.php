@@ -29,4 +29,11 @@ use Illuminate\Database\Eloquent\Model;
     {
         return $this->title;
     }
+    
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->whereNull('parent_id')->latest();
+    }
+
 }

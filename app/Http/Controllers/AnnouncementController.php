@@ -39,14 +39,11 @@ class AnnouncementController extends Controller
                 ->whereHas('category', fn ($q) => $q->whereNot('name', 'Faculty Meetings & Assemblies'))
                 ->whereHas('user', fn ($q) => $q->whereIn('role', ['usg', 'registrar', 'admin']));
         }
-
         elseif ($user->role === 'faculty') {
-            // Faculty: can see all approved announcements, no restrictions
-            // (Keep default $categories and $announcements)
         }
 
         elseif ($user->role === 'admin') {
-            // 🛠️ Admin: sees all categories and ALL announcements (even pending/rejected)
+            //Admin: sees all categories and ALL announcements (even pending/rejected)
             $announcements = Announcement::with(['category', 'user'])->latest()->get();
             $categories = Category::all();
             return view('announcement', compact('announcements', 'categories'));
@@ -124,8 +121,7 @@ class AnnouncementController extends Controller
         );
     }
 
-
-        public function showAdminDashboard()
+    public function showAdminDashboard()
         {
             return view('dashboard.admin', [
                 'pendingAnnouncements' => Announcement::where('status', 'pending')
@@ -135,7 +131,7 @@ class AnnouncementController extends Controller
             ]);
         }
 
-        /**
+    /**
      * Approve the announcement.
      */ 
     public function approve($id)
@@ -173,8 +169,26 @@ class AnnouncementController extends Controller
     // all post panel controller
     public function show($id)
     {
-        $announcement = Announcement::with(['user', 'category'])->findOrFail($id);
+        $announcement = Announcement::with([
+            'user',
+            'category',
+            'comments.user',
+            'comments.replies.user'
+        ])->findOrFail($id);
+
         return view('announcements.show', compact('announcement'));
+    }
+
+    public function loadComments($id)
+    {
+        $announcement = Announcement::with([
+            'user',
+            'category',
+            'comments.user',
+            'comments.replies.user'
+        ])->findOrFail($id);
+
+        return view('partials.comments_modal', compact('announcement'));
     }
 
     public function edit($id)
@@ -242,7 +256,5 @@ class AnnouncementController extends Controller
             'rejected' => Announcement::where('status', 'rejected')->count(),
         ]);
     }
-
-
 
 }

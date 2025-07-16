@@ -22,10 +22,11 @@
         <h2 class="text-xl font-semibold">Registrar Panel</h2>
       </div>
       <nav class="space-y-2">
-        <button id="btn-create" onclick="showPanel('create')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F] bg-[#E17C5F] text-white">Post Announcement</button>
+        <button id="btn-stats" onclick="showPanel('stats')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F] bg-[#E17C5F] text-white">Statistics</button>
+        <button id="btn-users" onclick="showPanel('users')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F] ">View Users</button>
+        <button id="btn-create" onclick="showPanel('create')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Post Announcement</button>
         <button id="btn-manage" onclick="showPanel('manage')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Manage Posts</button>
-        <button id="btn-users" onclick="showPanel('users')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">View Users</button>
-        <button id="btn-stats" onclick="showPanel('stats')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Statistics</button>
+        <button id="btn-settings" onclick="showPanel('settings')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Settings</button>
         <form id="logout-form" action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="nav-btn block w-full text-left px-4 py-2 rounded text-red-500 hover:bg-red-100">Logout</button>
@@ -37,7 +38,7 @@
     <main class="flex-1 p-8">
 
       <!-- Create Announcement Panel -->
-    <section id="create" class="panel">
+    <section id="create" class="panel hidden">
       <h1 class="text-2xl font-bold mb-6">Post New Announcement</h1>
 
       <div class="bg-white shadow-md rounded-lg p-6 max-w-3xl">
@@ -74,24 +75,13 @@
       </div>
     </section>
 
-
-    <!-- Confirmation Script -->
-    <script>
-      document.getElementById('announcementForm').addEventListener('submit', function (e) {
-        const confirmed = confirm('Are you sure you want to submit this announcement for approval?');
-        if (!confirmed) {
-          e.preventDefault();
-        }
-      });
-    </script>
-
-
     <!-- Manage Announcements Panel (Registrar) -->
     <section id="manage" class="panel hidden">
       <h1 class="text-2xl font-bold mb-6">Manage Announcements</h1>
 
       <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <input type="text" placeholder="Search announcements..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" />
+        <input type="text" id="registrarSearch" onkeyup="filterRegistrarAnnouncements()" 
+        placeholder="Search announcements..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" />
       </div>
 
       <div class="bg-white rounded shadow overflow-x-auto">
@@ -182,7 +172,7 @@
     </section>
 
     <!-- Stats Panel -->
-    <section id="stats" class="panel hidden rounded-md">
+    <section id="stats" class="panel rounded-md">
       <h1 class="text-2xl font-bold mb-6">Announcement Statistics</h1>
       
       <div class="bg-white border border-gray-300 rounded-md overflow-hidden max-w-lg ml-0">
@@ -214,6 +204,139 @@
         </table>
       </div>
     </section>
+
+  <!-- Registrar Settings -->
+  <section id="settings" class="panel hidden">
+      <h1 class="text-2xl font-bold mb-6">Registrar Settings</h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl">
+          <!-- Profile Update -->
+          <div class="bg-white p-6 rounded shadow border">
+              <form method="POST" action="{{ route('user.update') }}" enctype="multipart/form-data" class="space-y-6">
+                  @csrf
+                  @method('PUT')
+
+                  <h2 class="text-xl font-semibold mb-4">Update Profile</h2>
+
+                  <!-- Profile Picture -->
+                  <div class="flex items-center gap-6">
+                      <img id="profile-preview"
+                          src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                          class="rounded-full w-24 h-24 object-cover border-2 border-gray-300 shadow" />
+                      <input type="file" name="profile_picture" accept="image/*" onchange="previewProfileImage(this)" class="text-sm">
+                  </div>
+                  @error('profile_picture')
+                      <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                  @enderror
+
+                  <!-- Name -->
+                  <div>
+                      <label class="block text-sm font-medium mb-1">Name</label>
+                      <input type="text" name="name" value="{{ old('name', Auth::user()->name) }}" class="w-full p-2 border rounded" required>
+                      @error('name')
+                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                      @enderror
+                  </div>
+
+                  <!-- Email -->
+                  <div>
+                      <label class="block text-sm font-medium mb-1">Email</label>
+                      <input type="email" name="email" value="{{ old('email', Auth::user()->email) }}" class="w-full p-2 border rounded" required>
+                      @error('email')
+                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                      @enderror
+                  </div>
+
+                  <div class="flex justify-end">
+                      <button type="submit" class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Save Profile</button>
+                  </div>
+
+                  @if(session('success'))
+                      <p class="text-green-600 text-sm mt-2">{{ session('success') }}</p>
+                  @endif
+              </form>
+          </div>
+
+          <!-- Password Change -->
+          <div class="bg-white p-6 rounded shadow border">
+              <form method="POST" action="{{ route('admin.updatePassword') }}" class="space-y-6">
+                  @csrf
+                  @method('PUT')
+
+                  <h2 class="text-xl font-semibold mb-4">Change Password</h2>
+
+                  <div>
+                      <label class="block text-sm font-medium mb-1">Current Password</label>
+                      <input type="password" name="current_password" class="w-full p-2 border border-gray-300 rounded" required>
+                      @error('current_password')
+                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                      @enderror
+                  </div>
+
+                  <div>
+                      <label class="block text-sm font-medium mb-1">New Password</label>
+                      <input type="password" name="new_password" class="w-full p-2 border border-gray-300 rounded" required>
+                      @error('new_password')
+                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                      @enderror
+                  </div>
+
+                  <div>
+                      <label class="block text-sm font-medium mb-1">Confirm Password</label>
+                      <input type="password" name="new_password_confirmation" class="w-full p-2 border border-gray-300 rounded" required>
+                  </div>
+
+                  <div class="flex justify-end">
+                      <button class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Save Password</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </section>
+
+    <script>
+      document.getElementById('announcementForm').addEventListener('submit', function (e) {
+        const confirmed = confirm('Are you sure you want to submit this announcement for approval?');
+        if (!confirmed) {
+          e.preventDefault();
+        }
+      });
+      function showPanel(id) {
+        document.querySelectorAll('.panel').forEach(panel => panel.classList.add('hidden'));
+        const active = document.getElementById(id);
+        if (active) active.classList.remove('hidden');
+
+        // highlight nav buttons if needed
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-[#E17C5F]', 'text-white'));
+        const clicked = document.querySelector(`#btn-${id}`);
+        if (clicked) clicked.classList.add('bg-[#E17C5F]', 'text-white');
+
+        history.replaceState(null, null, '#' + id);
+      }
+
+      // On page load, check the URL hash and show the panel
+      document.addEventListener('DOMContentLoaded', function () {
+        const hash = window.location.hash.replace('#', '') || 'stats';
+        showPanel(hash);
+      });
+
+      function filterRegistrarAnnouncements() {
+        const input = document.getElementById('registrarSearch');
+        const filter = input.value.toLowerCase();
+        const rows = document.querySelectorAll('#manage table tbody tr');
+
+        rows.forEach(row => {
+          const status = row.children[0]?.textContent.toLowerCase() || '';
+          const title = row.children[1]?.textContent.toLowerCase() || '';
+          const category = row.children[2]?.textContent.toLowerCase() || '';
+          const date = row.children[3]?.textContent.toLowerCase() || '';
+          const postedBy = row.children[4]?.textContent.toLowerCase() || '';
+
+          const combined = `${status} ${title} ${category} ${date} ${postedBy}`;
+          row.style.display = combined.includes(filter) ? '' : 'none';
+        });
+      }
+    </script>
 
     </main>
   </div>

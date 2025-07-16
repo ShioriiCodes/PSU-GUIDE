@@ -14,6 +14,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModeratorController;
+use App\Http\Controllers\CommentController;
 
 // User Routes
 Route::middleware(['auth'])->group(function () {
@@ -89,29 +90,32 @@ Route::post('/faculty/{id}/export', [FacultyController::class, 'export'])->name(
 // mods
 Route::get('/moderators/{id}', [ModeratorController::class, 'show'])->name('moderators.show');
 Route::post('/moderators/{id}/export', [ModeratorController::class, 'export'])->name('moderators.export');
-;
+
+Route::get('/dashboard/usg', [ModeratorController::class, 'usgDashboard'])->name('dashboard.usg');
 
 // Faculty Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/faculty/{id}', [FacultyController::class, 'show'])->name('faculty.show');
     // View single student
     Route::get('/students/{id}', [StudentController::class, 'show'])->name('students.show');
-
     // Edit student
     Route::get('/students/{id}/edit', [StudentController::class, 'edit'])->name('students.edit');
-
     // Export formats (JSON, Excel, pdf)
     Route::get('/students/{id}/export', [StudentController::class, 'export'])->name('students.export');
-
     // Toggle active/inactive
     Route::post('/students/{id}/toggle-status', [StudentController::class, 'toggleStatus'])->name('students.toggleStatus');
-
     // Delete 
     Route::delete('/accounts/{id}', [StudentController::class, 'destroy'])->name('accounts.destroy');
-
 });
 
-// Student Routes
+// comment
+Route::middleware(['auth'])->group(function () {
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::get('/announcement/{id}/comments', [AnnouncementController::class, 'loadComments']);
+
+});
 
 // Dashboard Route (Smart Redirection Based on Role)
 Route::middleware(['auth'])->get('/dashboard', function () {
