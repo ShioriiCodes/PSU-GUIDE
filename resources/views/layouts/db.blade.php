@@ -17,10 +17,6 @@
   
   @yield('content')
 
-  <footer class="bg-[#D5451B] text-white text-center px-4 py-6 text-sm sm:text-base">
-    <p>&copy; 2025 PSU-GUIDE | Palawan State University Quezon Campus</p>
-    <p>Contact: <a href="mailto:psuguide@gmail.com" class="underline hover:text-gray-200">psuguide@gmail.com</a></p>
-  </footer>
 
   <script src="{{ asset('js/profile.js') }}"></script>
 </body>

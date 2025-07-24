@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Models\Department;
+use App\Models\Announcement;
 
 class AdminImportController extends Controller
 {

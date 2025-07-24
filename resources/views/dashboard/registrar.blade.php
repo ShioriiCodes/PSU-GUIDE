@@ -10,9 +10,17 @@
   <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/png">
 </head>
 <body class="bg-[#F4E7E1] font-poppins">
-  <div class="min-h-screen flex">
+
+  <div class="min-h-screen flex flex-col md:flex-row relative">
+    <!-- Mobile Sidebar Toggle -->
+    <button id="toggleSidebar" class="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded shadow">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md p-6 space-y-4">
+    <aside id="sidebar" class="w-full md:w-64 bg-white shadow-md p-6 space-y-4 z-40 fixed md:static top-0 left-0 h-full md:h-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
       <div class="flex items-center gap-4 mb-6">
         <a href="/" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300" title="Back to Home">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -205,141 +213,97 @@
       </div>
     </section>
 
-  <!-- Registrar Settings -->
-  <section id="settings" class="panel hidden">
-      <h1 class="text-2xl font-bold mb-6">Registrar Settings</h1>
+    <!-- Registrar Settings -->
+    <section id="settings" class="panel hidden">
+        <h1 class="text-2xl font-bold mb-6">Registrar Settings</h1>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl">
-          <!-- Profile Update -->
-          <div class="bg-white p-6 rounded shadow border">
-              <form method="POST" action="{{ route('user.update') }}" enctype="multipart/form-data" class="space-y-6">
-                  @csrf
-                  @method('PUT')
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl">
+            <!-- Profile Update -->
+            <div class="bg-white p-6 rounded shadow border">
+                <form method="POST" action="{{ route('user.update') }}" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    @method('PUT')
 
-                  <h2 class="text-xl font-semibold mb-4">Update Profile</h2>
+                    <h2 class="text-xl font-semibold mb-4">Update Profile</h2>
 
-                  <!-- Profile Picture -->
-                  <div class="flex items-center gap-6">
-                      <img id="profile-preview"
-                          src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
-                          class="rounded-full w-24 h-24 object-cover border-2 border-gray-300 shadow" />
-                      <input type="file" name="profile_picture" accept="image/*" onchange="previewProfileImage(this)" class="text-sm">
-                  </div>
-                  @error('profile_picture')
-                      <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                  @enderror
+                    <!-- Profile Picture -->
+                    <div class="flex items-center gap-6">
+                        <img id="profile-preview"
+                            src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                            class="rounded-full w-24 h-24 object-cover border-2 border-gray-300 shadow" />
+                        <input type="file" name="profile_picture" accept="image/*" onchange="previewProfileImage(this)" class="text-sm">
+                    </div>
+                    @error('profile_picture')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
 
-                  <!-- Name -->
-                  <div>
-                      <label class="block text-sm font-medium mb-1">Name</label>
-                      <input type="text" name="name" value="{{ old('name', Auth::user()->name) }}" class="w-full p-2 border rounded" required>
-                      @error('name')
-                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                      @enderror
-                  </div>
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Name</label>
+                        <input type="text" name="name" value="{{ old('name', Auth::user()->name) }}" class="w-full p-2 border rounded" required>
+                        @error('name')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                  <!-- Email -->
-                  <div>
-                      <label class="block text-sm font-medium mb-1">Email</label>
-                      <input type="email" name="email" value="{{ old('email', Auth::user()->email) }}" class="w-full p-2 border rounded" required>
-                      @error('email')
-                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                      @enderror
-                  </div>
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" name="email" value="{{ old('email', Auth::user()->email) }}" class="w-full p-2 border rounded" required>
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                  <div class="flex justify-end">
-                      <button type="submit" class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Save Profile</button>
-                  </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Save Profile</button>
+                    </div>
 
-                  @if(session('success'))
-                      <p class="text-green-600 text-sm mt-2">{{ session('success') }}</p>
-                  @endif
-              </form>
-          </div>
+                    @if(session('success'))
+                        <p class="text-green-600 text-sm mt-2">{{ session('success') }}</p>
+                    @endif
+                </form>
+            </div>
 
-          <!-- Password Change -->
-          <div class="bg-white p-6 rounded shadow border">
-              <form method="POST" action="{{ route('admin.updatePassword') }}" class="space-y-6">
-                  @csrf
-                  @method('PUT')
+            <!-- Password Change -->
+            <div class="bg-white p-6 rounded shadow border">
+                <form method="POST" action="{{ route('admin.updatePassword') }}" class="space-y-6">
+                    @csrf
+                    @method('PUT')
 
-                  <h2 class="text-xl font-semibold mb-4">Change Password</h2>
+                    <h2 class="text-xl font-semibold mb-4">Change Password</h2>
 
-                  <div>
-                      <label class="block text-sm font-medium mb-1">Current Password</label>
-                      <input type="password" name="current_password" class="w-full p-2 border border-gray-300 rounded" required>
-                      @error('current_password')
-                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                      @enderror
-                  </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Current Password</label>
+                        <input type="password" name="current_password" class="w-full p-2 border border-gray-300 rounded" required>
+                        @error('current_password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                  <div>
-                      <label class="block text-sm font-medium mb-1">New Password</label>
-                      <input type="password" name="new_password" class="w-full p-2 border border-gray-300 rounded" required>
-                      @error('new_password')
-                          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                      @enderror
-                  </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">New Password</label>
+                        <input type="password" name="new_password" class="w-full p-2 border border-gray-300 rounded" required>
+                        @error('new_password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                  <div>
-                      <label class="block text-sm font-medium mb-1">Confirm Password</label>
-                      <input type="password" name="new_password_confirmation" class="w-full p-2 border border-gray-300 rounded" required>
-                  </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Confirm Password</label>
+                        <input type="password" name="new_password_confirmation" class="w-full p-2 border border-gray-300 rounded" required>
+                    </div>
 
-                  <div class="flex justify-end">
-                      <button class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Save Password</button>
-                  </div>
-              </form>
-          </div>
-      </div>
-  </section>
+                    <div class="flex justify-end">
+                        <button class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Save Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
 
-    <script>
-      document.getElementById('announcementForm').addEventListener('submit', function (e) {
-        const confirmed = confirm('Are you sure you want to submit this announcement for approval?');
-        if (!confirmed) {
-          e.preventDefault();
-        }
-      });
-      function showPanel(id) {
-        document.querySelectorAll('.panel').forEach(panel => panel.classList.add('hidden'));
-        const active = document.getElementById(id);
-        if (active) active.classList.remove('hidden');
-
-        // highlight nav buttons if needed
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-[#E17C5F]', 'text-white'));
-        const clicked = document.querySelector(`#btn-${id}`);
-        if (clicked) clicked.classList.add('bg-[#E17C5F]', 'text-white');
-
-        history.replaceState(null, null, '#' + id);
-      }
-
-      // On page load, check the URL hash and show the panel
-      document.addEventListener('DOMContentLoaded', function () {
-        const hash = window.location.hash.replace('#', '') || 'stats';
-        showPanel(hash);
-      });
-
-      function filterRegistrarAnnouncements() {
-        const input = document.getElementById('registrarSearch');
-        const filter = input.value.toLowerCase();
-        const rows = document.querySelectorAll('#manage table tbody tr');
-
-        rows.forEach(row => {
-          const status = row.children[0]?.textContent.toLowerCase() || '';
-          const title = row.children[1]?.textContent.toLowerCase() || '';
-          const category = row.children[2]?.textContent.toLowerCase() || '';
-          const date = row.children[3]?.textContent.toLowerCase() || '';
-          const postedBy = row.children[4]?.textContent.toLowerCase() || '';
-
-          const combined = `${status} ${title} ${category} ${date} ${postedBy}`;
-          row.style.display = combined.includes(filter) ? '' : 'none';
-        });
-      }
-    </script>
-
-    </main>
-  </div>
+  </main>
+</div>
 
   <script src="{{ asset('js/moderatos.js') }}"></script>
 </body>

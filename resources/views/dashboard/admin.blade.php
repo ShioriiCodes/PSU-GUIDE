@@ -9,12 +9,20 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/png">
 </head>
+
 <body class="bg-[#F4E7E1] font-poppins">
     
-    <div class="min-h-screen flex bg-[url('{{ asset('image/bg_registrar1.jpeg') }}')] bg-cover bg-center bg-no-repeat z-10">
+    <div class="min-h-screen flex flex-col md:flex-row bg-[url('{{ asset('image/bg_registrar1.jpeg') }}')] bg-cover bg-center bg-no-repeat relative">
     <div class="fixed inset-0 bg-white/85 z-0 h-full min-h-screen"></div>
+    <!-- Mobile Toggle Button -->
+    <button id="toggleSidebar" class="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded shadow">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md p-6 space-y-4 z-10">
+    <aside id="sidebar" class="w-full md:w-64 bg-white shadow-md p-6 space-y-4 z-40 fixed md:static top-0 left-0 h-full md:h-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
         <div class="flex items-center gap-4 mb-6">
             <a href="/" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300" title="Back to Home">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -41,7 +49,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-8 z-10">
+    <main class="flex-1 p-4 sm:p-6 md:p-8 z-10 overflow-x-hidden">
         @if(session('success'))
             <div id="alertSuccess" class="transition-opacity duration-1000 opacity-100 bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
                 {{ session('success') }}
@@ -65,6 +73,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Dashboard Panel -->
         <section id="dashboard" class="panel">
             <h1 class="text-2xl font-bold mb-6">Website Statistics</h1>
@@ -107,6 +116,12 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse ($pendingAnnouncements as $announcement)
             <div class="bg-white border rounded p-4 shadow-sm">
+                @if($announcement->poster_image)
+                    <img src="{{ asset('storage/' . $announcement->poster_image) }}"
+                        alt="Poster Image"
+                        class="w-full h-48 object-cover rounded mb-4">
+                @endif
+
                 <h2 class="font-semibold text-lg text-gray-800">{{ $announcement->title }}</h2>
                 <p class="text-sm text-gray-600 mt-1">
                 <strong>Submitted by:</strong> {{ $announcement->user->name ?? 'Unknown' }} <br>
@@ -216,7 +231,7 @@
         <section id="postPanel" class="panel bg-white shadow-md rounded-xl p-6 max-w-3xl mx-auto my-10 hidden">
             <h1 class="text-2xl font-bold mb-6 text-[#000000]">Create Announcement</h1>
 
-            <form action="{{ route('announcement.admin.store') }}" method="POST" class="space-y-5">
+            <form action="{{ route('announcement.admin.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 <!-- Title -->
                 <div>
@@ -228,6 +243,14 @@
                     <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
                     <textarea name="content" id="content" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF9B45]" placeholder="Enter announcement content..." required></textarea>
                 </div>
+                <!-- Poster Image -->
+                <div>
+                    <label for="poster_image" class="block text-sm font-medium text-gray-700 mb-1">Poster Image (Optional)</label>
+                    <input type="file" name="poster_image" id="poster_image"
+                        accept="image/*"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF9B45]">
+                </div>
+
                 <!-- Category -->
                 <div>
                     <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -264,47 +287,77 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Poster</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Title</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Content</th>
-                            {{-- <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Source</th> --}}
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Posted By</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($announcements as $post)
-                            <tr>
-                                <td class="px-6 py-4">
-                                    @if ($post->status === 'approved')
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
-                                    @elseif ($post->status === 'rejected')
-                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
-                                    @else
-                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 font-semibold">{{ $post->title }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-700">{{ Str::limit(strip_tags($post->content), 80) }}</td>
-                                {{-- <td class="px-6 py-4">{{ ucfirst($post->user->role ?? 'Unknown') }}</td> --}}
-                                <td class="px-6 py-4">{{ $post->created_at->format('Y-m-d') }}</td>
-                                <td class="px-6 py-4">{{ $post->user->name   ?? 'Unknown' }}</td>
-                                <td class="px-6 py-4 space-x-2">
-                                    <a href="{{ route('announcements.show', $post->id) }}" class="text-blue-600 hover:underline">View</a>
-                                    <a href="{{ route('announcements.edit', $post->id) }}" class="text-yellow-600 hover:underline">Edit</a>
-                                    <form method="POST" action="{{ route('announcements.destroy', $post->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this announcement?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:underline" title="Delete Announcement">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">No announcements found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+                    @forelse ($announcements as $post)
+                        <tr>
+                            <!-- Status -->
+                            <td class="px-6 py-4">
+                                @if ($post->status === 'approved')
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
+                                @elseif ($post->status === 'rejected')
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
+                                @else
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
+                                @endif
+                            </td>
+
+                            <!-- Poster Image -->
+                            <td class="px-6 py-4">
+                                @if($post->poster_image)
+                                    <img src="{{ asset('storage/' . $post->poster_image) }}"
+                                        alt="Poster Image"
+                                        class="w-24 h-24 object-cover rounded shadow">
+                                @else
+                                    <span class="text-gray-400 italic text-sm">No image</span>
+                                @endif
+                            </td>
+
+                            <!-- Title -->
+                            <td class="px-6 py-4 font-semibold">
+                                {{ $post->title }}
+                            </td>
+
+                            <!-- Content -->
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                {{ Str::limit(strip_tags($post->content), 80) }}
+                            </td>
+
+                            <!-- Date -->
+                            <td class="px-6 py-4">
+                                {{ $post->created_at->format('Y-m-d') }}
+                            </td>
+
+                            <!-- Posted By -->
+                            <td class="px-6 py-4">
+                                {{ $post->user->name ?? 'Unknown' }}
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 space-x-2">
+                                <a href="{{ route('announcements.show', $post->id) }}" class="text-blue-600 hover:underline">View</a>
+                                <a href="{{ route('announcements.edit', $post->id) }}" class="text-yellow-600 hover:underline">Edit</a>
+                                <form method="POST" action="{{ route('announcements.destroy', $post->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this announcement?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:underline" title="Delete Announcement">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No announcements found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
                 </table>
             </div>
         </section>
@@ -321,8 +374,7 @@
                 </button>
             </div>
                 <!-- Add Moderator Modal -->
-                <div id="addModeratorModal"
-                    class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 items-center justify-center">
+                <div id="addModeratorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
                     <div class="bg-white p-8 rounded-lg w-full max-w-2xl shadow-lg">
                         @if (session('success'))
                         <div class="p-3 bg-green-100 text-green-800 rounded mb-4">
@@ -465,7 +517,7 @@
             <input type="text" id="studentSearch" placeholder="Search students..." 
             class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterTableRows('studentSearch', '#students table tbody tr')">
             <div class="flex gap-2">
-                <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Student</button>
+                {{-- <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Student</button> --}}
                 <button onclick="toggleImportForm()" class="px-4 py-2 bg-[#E17C5F] text-white rounded">Import Students</button>
             </div>
         </div>
@@ -575,7 +627,7 @@
                 class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterTableRows('facultySearch', '#faculty table tbody tr')">
                 <div class="flex gap-2">
                     <button onclick="toggleImportFacultyForm()" class="px-4 py-2 bg-[#E17C5F] text-white rounded">Import Faculty</button>
-                    <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Faculty</button>
+                    {{-- <button class="px-4 py-2 bg-[#E17C5F] text-white rounded">Add Faculty</button> --}}
                 </div>
             </div>
 
@@ -790,7 +842,7 @@
                         <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Timestamp</th>
                         <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">User</th>
                         <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Action</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Role</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Related & Role</th>
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100 text-sm text-gray-700">
@@ -848,89 +900,6 @@
 
 </div>
 
-    <script>
-        function previewProfileImage(input) {
-            const preview = document.getElementById('profile-preview');
-            const file = input.files[0];
-            if (file) {
-            const reader = new FileReader();
-            reader.onload = e => preview.src = e.target.result;
-            reader.readAsDataURL(file);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const openPanel = @json(session('openPanel'));
-            if (openPanel) {
-                showPanel(openPanel);
-            }
-        });
-
-        function showPanel(panelId) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
-            document.getElementById(panelId).classList.remove('hidden');
-
-            // Update sidebar active class
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-[#E17C5F]', 'text-white'));
-            const activeBtn = document.getElementById(`btn-${panelId}`);
-        if (activeBtn) activeBtn.classList.add('bg-[#E17C5F]', 'text-white');
-        }
-
-        let deleteFormToSubmit = null;
-
-        function showDeleteModal(event) {
-            event.preventDefault();
-            deleteFormToSubmit = event.target;
-
-        const userName = deleteFormToSubmit.dataset.name || 'this account';
-            document.getElementById('deleteTargetName').textContent = userName;
-
-            document.getElementById('deleteModal').classList.remove('hidden');
-        return false;
-        }
-
-        function closeDeleteModal() {
-            deleteFormToSubmit = null;
-            document.getElementById('deleteModal').classList.add('hidden');
-        }
-
-        function submitDeleteForm() {
-            if (deleteFormToSubmit) {
-                deleteFormToSubmit.submit();
-            }
-        }
-
-            window.addEventListener('DOMContentLoaded', () => {
-        const successAlert = document.getElementById('alertSuccess');
-        const errorAlert = document.getElementById('alertError');
-        [
-            successAlert, errorAlert].forEach(alert => {
-                if (alert) {
-                    setTimeout(() => {
-                    alert.classList.add('opacity-0');
-                    setTimeout(() => alert.remove(), 1000); // remove after fade
-                    }, 3000); // visible for 3s
-                }
-            });
-        });
-
-        function toggleImportFacultyForm() {
-            const form = document.getElementById('importFacultyForm');
-            form.classList.toggle('hidden');
-        }
-
-        function filterTableRows(inputId, rowSelector) {
-            const input = document.getElementById(inputId);
-            const filter = input.value.toLowerCase();
-            const rows = document.querySelectorAll(rowSelector);
-
-            rows.forEach(row => {
-                const rowText = row.textContent.toLowerCase();
-                row.style.display = rowText.includes(filter) ? '' : 'none';
-            });
-        }
-
-    </script>
         <script src="//unpkg.com/alpinejs" defer></script>
         <script src="{{ asset('js/admin.js') }}"></script>
 </body>

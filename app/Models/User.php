@@ -26,7 +26,7 @@ class User extends Authenticatable
         'role',
         'notification_settings',
         'department_id',
-
+        
     ];
 
     /**

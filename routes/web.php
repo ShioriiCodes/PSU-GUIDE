@@ -15,15 +15,19 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModeratorController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\HomeController;
+use App\Models\Announcement;
+
 
 // User Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
     Route::put('/profile/update', [UserController::class, 'update'])->name('user.update')->middleware('auth');
     Route::put('/user/update-password', [UserController::class, 'updatePassword'])->name('user.updatePassword');
-    Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
-    Route::put('/profile/update', [UserController::class, 'update'])->name('user.update');  
+    // Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+    // Route::put('/profile/update', [UserController::class, 'update'])->name('user.update');  
     Route::put('/user/preferences', [UserController::class, 'updatePreferences'])->name('user.preferences.update');;
+Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
 });
 
@@ -40,6 +44,7 @@ Route::get('/about', function () {
 Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement');
 Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcement.store');
 
+
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
@@ -53,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/admin/update-password', [UserController::class, 'updatePassword'])->name('admin.updatePassword')->middleware('auth');
     Route::get('/activity-logs/export/{format}', [ActivityLogController::class, 'export'])->name('activityLogs.export');
     Route::get('/activity-logs/export-raw/excel', [ActivityLogController::class, 'exportExcelRaw'])->name('activityLogs.exportRaw');
-    Route::middleware(['auth'])->get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.admin');
+    // Route::middleware(['auth'])->get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.admin');
     Route::post('/admin/moderators', [AdminDashboardController::class, 'storeModerator'])->name('admin.moderators.store');
     Route::patch('/announcement/{id}/approve', [AnnouncementController::class, 'approve'])->name('announcement.approve');
     Route::patch('/announcement/{id}/reject', [AnnouncementController::class, 'reject'])->name('announcement.reject');
@@ -61,7 +66,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/announcements/{id}', [AnnouncementController::class, 'show'])->name('announcements.show');
     Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
     Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
-
+    Route::get('/announcement/{id}/full', [AnnouncementController::class, 'loadFull'])->name('announcement.full');
 });
 
 // Registrar and USG Routes
@@ -93,9 +98,14 @@ Route::post('/moderators/{id}/export', [ModeratorController::class, 'export'])->
 
 Route::get('/dashboard/usg', [ModeratorController::class, 'usgDashboard'])->name('dashboard.usg');
 
+
+Route::get('/test-model', function () {
+    return Announcement::count();
+});
 // Faculty Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/faculty/{id}', [FacultyController::class, 'show'])->name('faculty.show');
+
     // View single student
     Route::get('/students/{id}', [StudentController::class, 'show'])->name('students.show');
     // Edit student
@@ -110,12 +120,17 @@ Route::middleware(['auth'])->group(function () {
 
 // comment
 Route::middleware(['auth'])->group(function () {
+    
+    Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comments.edit');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
-    Route::get('/announcement/{id}/comments', [AnnouncementController::class, 'loadComments']);
+    Route::get('/announcement/{id}/comments', [AnnouncementController::class, 'loadComments'])->name('announcement.comments');
 
 });
+
+// in routes/web.php
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Dashboard Route (Smart Redirection Based on Role)
 Route::middleware(['auth'])->get('/dashboard', function () {
@@ -129,6 +144,10 @@ Route::middleware(['auth'])->get('/dashboard', function () {
     };
 })->name('dashboard');
 
+Route::get('/notifications/mark-read', function () {
+    Auth::user()->unreadNotifications->markAsRead();
+    return response()->json(['status' => 'read']);
+})->name('notifications.markAllRead')->middleware('auth');
 
 Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
 

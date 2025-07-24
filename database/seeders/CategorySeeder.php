@@ -9,22 +9,28 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = [
-            // Registrar
-            'Registrar Notices',
-            'Enrollment Schedules',
-            'Academic Deadlines',
 
-            // USG
-            'USG Announcements',
-            'Student Activities',
+    $categories = [
+        // Registrar
+        'Registrar Notices',
+        'Enrollment Schedules',
+        'Academic Deadlines',
+        'Memorandom',
 
-            // Admin
-            'Campus Updates',
-            'Campus Events',
-            'Workshops & Seminars',
-            'Social Gatherings',
-        ];
+        // USG
+        'USG Announcements',
+        'Student Activities',
+
+        // Admin
+        'Campus Updates',
+        'Campus Events',
+        'Workshops & Seminars',
+        'Social Gatherings',
+
+        // Faculty
+        'Faculty Meetings',
+        'Emergency Faculty Meetings',
+    ];
 
         foreach ($categories as $name) {
             Category::firstOrCreate(['name' => $name]);

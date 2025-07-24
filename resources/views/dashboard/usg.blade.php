@@ -9,9 +9,15 @@
   <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/png">
 </head>
 <body class="bg-[#F4E7E1] font-poppins">
-  <div class="min-h-screen flex">
+
+  <div class="min-h-screen flex flex-col md:flex-row relative">
+    <button id="toggleSidebar" class="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded shadow">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md p-6 space-y-4">
+    <aside id="sidebar" class="w-full md:w-64 bg-white shadow-md p-6 space-y-4 fixed md:static top-0 left-0 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
       <div class="flex items-center gap-4 mb-6">
         <a href="/" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300" title="Back to Home">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,7 +45,7 @@
   <!-- CREATE Announcement Panel -->
   <section id="create" class="panel hidden">
     <h1 class="text-2xl font-bold mb-6">Post New Announcement</h1>
-    <div class="bg-white shadow-md rounded-lg p-6 max-w-3xl">
+    <div class="bg-white shadow-md rounded-lg p-10 max-w-3xl">
       <form id="announcementForm" action="{{ route('announcement.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 mt-[-50px]">
         @csrf
         <div>
@@ -69,52 +75,55 @@
     <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <input type="text" id="announcementSearch" placeholder="Search announcements..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" onkeyup="filterAnnouncements()" />
     </div>
-    <div class="bg-white rounded shadow overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Title</th>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Category</th>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Posted By</th>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          @forelse ($announcements as $a)
-          <tr>
-            <td class="px-6 py-4">
-              @if ($a->status === 'approved')
-                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
-              @elseif ($a->status === 'rejected')
-                <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
-              @else
-                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
-              @endif
-            </td>
-            <td class="px-6 py-4 font-semibold">{{ $a->title }}</td>
-            <td class="px-6 py-4">{{ $a->category->name ?? '—' }}</td>
-            <td class="px-6 py-4">{{ $a->created_at->format('Y-m-d') }}</td>
-            <td class="px-6 py-4">{{ $a->user->name ?? 'Unknown' }} ({{ $a->user->role ?? 'N/A' }})</td>
-            <td class="px-6 py-4 space-x-2">
-              <a href="{{ route('announcements.show', $a->id) }}" class="text-blue-600 hover:underline">View</a>
-              <a href="{{ route('announcements.edit', $a->id) }}" class="text-yellow-600 hover:underline">Edit</a>
-              <form method="POST" action="{{ route('announcements.destroy', $a->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this announcement?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="text-red-600 hover:underline">Delete</button>
-              </form>
-            </td>
-          </tr>
-          @empty
-          <tr>
-            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No announcements found.</td>
-          </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
+      <div class="bg-white rounded shadow overflow-x-auto w-full">
+        <table class="min-w-full table-auto text-sm">
+          <thead class="bg-gray-100 text-xs sm:text-sm">
+            <tr>
+              <th class="px-4 py-2 text-left text-gray-700 whitespace-nowrap">Status</th>
+              <th class="px-4 py-2 text-left text-gray-700 whitespace-nowrap">Title</th>
+              <th class="px-4 py-2 text-left text-gray-700 whitespace-nowrap">Category</th>
+              <th class="px-4 py-2 text-left text-gray-700 whitespace-nowrap">Date</th>
+              <th class="px-4 py-2 text-left text-gray-700 whitespace-nowrap">Posted By</th>
+              <th class="px-4 py-2 text-left text-gray-700 whitespace-nowrap">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @forelse ($announcements as $a)
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3">
+                  @if ($a->status === 'approved')
+                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
+                  @elseif ($a->status === 'rejected')
+                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
+                  @else
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
+                  @endif
+                </td>
+                <td class="px-4 py-3 font-semibold break-words max-w-[12rem]">{{ $a->title }}</td>
+                <td class="px-4 py-3">{{ $a->category->name ?? '—' }}</td>
+                <td class="px-4 py-3">{{ $a->created_at->format('Y-m-d') }}</td>
+                <td class="px-4 py-3">
+                  {{ $a->user->name ?? 'Unknown' }} <br class="block sm:hidden" />
+                  <span class="text-xs text-gray-500 hidden sm:inline">({{ $a->user->role ?? 'N/A' }})</span>
+                </td>
+                <td class="px-4 py-3 space-y-1 space-x-0 sm:space-x-2 sm:space-y-0 text-sm">
+                  <a href="{{ route('announcements.show', $a->id) }}" class="text-blue-600 hover:underline block sm:inline">View</a>
+                  <a href="{{ route('announcements.edit', $a->id) }}" class="text-yellow-600 hover:underline block sm:inline">Edit</a>
+                  <form method="POST" action="{{ route('announcements.destroy', $a->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this announcement?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-red-600 hover:underline block sm:inline">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="6" class="px-4 py-4 text-center text-gray-500">No announcements found.</td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
   </section>
 
   <!-- USERS Panel -->
@@ -228,43 +237,6 @@
 
     </main>
   </div>
-
-  <script>
-      function showPanel(id) {
-        document.querySelectorAll('.panel').forEach(panel => panel.classList.add('hidden'));
-        const active = document.getElementById(id);
-        if (active) active.classList.remove('hidden');
-
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-[#E17C5F]', 'text-white'));
-        const clicked = document.querySelector(`#btn-${id}`);
-        if (clicked) clicked.classList.add('bg-[#E17C5F]', 'text-white');
-
-        history.replaceState(null, null, '#' + id);
-      }
-
-      document.addEventListener('DOMContentLoaded', function () {
-        const hash = window.location.hash.replace('#', '') || 'stats';
-        showPanel(hash);
-      });
-
-      function filterAnnouncements() {
-      const input = document.getElementById('announcementSearch');
-      const filter = input.value.toLowerCase();
-      const rows = document.querySelectorAll('#manage table tbody tr');
-
-      rows.forEach(row => {
-        const title = row.children[1]?.textContent.toLowerCase() || '';
-        const category = row.children[2]?.textContent.toLowerCase() || '';
-        const date = row.children[3]?.textContent.toLowerCase() || '';
-        const postedBy = row.children[4]?.textContent.toLowerCase() || '';
-        const status = row.children[0]?.textContent.toLowerCase() || '';
-
-        const combined = [title, category, date, postedBy, status].join(' ');
-        row.style.display = combined.includes(filter) ? '' : 'none';
-      });
-    }
-
-  </script>
 
   <script src="{{ asset('js/moderatos.js') }}"></script>
 </body>

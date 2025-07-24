@@ -6,9 +6,16 @@
 @section('content')
     
   <!-- Navbar -->
-  <div class="min-h-screen flex font-poppins">
+  <div class="min-h-screen flex flex-col md:flex-row font-poppins">
+    <!-- Mobile toggle button -->
+    <button id="toggleSidebar" class="md:hidden p-3 bg-white shadow fixed top-4 right-4 z-50 rounded">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-lg p-4 font-poppins">
+    <aside id="sidebar" class="md:w-64 w-full md:static fixed z-40 top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out bg-white shadow-lg p-4 md:h-auto h-full space-y-4">
       <div class="flex items-center gap-4 mb-6">
         <a href="{{ asset('/') }}" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300" title="Back to Home">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -24,7 +31,11 @@
         <button class="block w-full text-left py-2 px-4 rounded hover:bg-[#E17C5F]" onclick="showTab('legal', this)">Legal</button>
         <form method="POST" action="{{ route('logout') }}">
           @csrf
-            <button type="submit" class="block w-full text-left py-2 px-4 rounded hover:bg-[#E17C5F]">Log Out</button>
+          <button 
+            type="submit" 
+            class="block w-full text-left py-2 px-4 rounded bg-red-200 text-white hover:bg-red-600 hover:text-white">
+            Log Out
+          </button>
         </form>
       </nav>
     </aside>
@@ -204,7 +215,6 @@
           </form>
         </div>
 
-
       <!-- Legal Section -->
       <div id="legal" class="tab hidden">
         <div class="max-w-5xl mx-auto p-6 bg-white rounded-md shadow-md py-[30px] px-[50px]">
@@ -250,6 +260,6 @@
       <div id="apps" class="tab hidden"><h2 class="text-2xl font-bold">Connected Apps</h2></div>
     </main>
 
-
   </div>
 
+@endsection

@@ -14,7 +14,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('category_id')->nullable();
             $table->unsignedBigInteger('posted_by')->nullable();
             $table->boolean('is_approved')->default(false);
+            $table->string('poster_image')->nullable(); // <- Added for poster/memo image
             $table->timestamps();
+
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->foreign('posted_by')->references('id')->on('users')->onDelete('set null');
         });

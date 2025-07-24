@@ -1,19 +1,36 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Notifications\DatabaseNotification;
 
 use Illuminate\Database\Eloquent\Model;
 
     class Announcement extends Model
     {
+        
+    use HasFactory;
     protected $fillable = [
-            'title',
-            'content',
-            'category_id',
-            'is_approved',
-            'posted_by',
-            'status'
-        ];
+        'title',
+        'content',
+        'category_id',
+        'is_approved',
+        'posted_by',
+        'status',
+        'poster_image'
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($announcement) {
+            // Delete notifications related to this announcement
+            if (Schema::hasTable('notifications')) {
+                DatabaseNotification::where('data->announcement_id', $announcement->id)->delete();
+            }
+        });
+    }
 
     public function user()
         {

@@ -92,52 +92,29 @@
       </div>
     </section>
 
-    <!-- Latest Announcements Section -->
-    <section class="container mx-auto px-4 sm:px-6 py-16 max-w-[1400px]">
-      <h2 class="text-2xl sm:text-3xl font-bold text-center text-black mb-10">
-        Latest Announcements
-      </h2>
+<section class="container mx-auto px-4 sm:px-6 py-16 max-w-[1400px]">
+  <h2 class="text-2xl sm:text-3xl font-bold text-center text-black mb-10">
+    Latest Announcements
+  </h2>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        
-        <!-- Announcement Card -->
-        <div class="bg-white text-black p-6 rounded-lg shadow-md hover:shadow-lg transition flex flex-col justify-between h-full">
-          <div>
-            <h3 class="text-lg sm:text-xl font-semibold mb-2">Enrollment Schedule 1st Sem 2025</h3>
-            <p class="text-sm text-black mb-3">Posted on July 1, 2025</p>
-            <p class="text-sm sm:text-base text-black">Enrollment opens August 5. Prepare your documents now.</p>
-          </div>
-          <span class="mt-6 inline-block text-xs text-white bg-[#FF9B45] px-3 py-1 rounded-md self-start">
-            For Students Only
-          </span>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    @forelse($latestAnnouncements as $announcement)
+      <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition flex flex-col justify-between h-full">
+        <div>
+          <h3 class="text-lg sm:text-xl font-semibold mb-2 text-black">{{ $announcement->title }}</h3>
+          <p class="text-sm text-black mb-3">Posted on {{ $announcement->created_at->format('F j, Y') }}</p>
+          <p class="text-sm sm:text-base text-black">{{ Str::limit($announcement->content, 100) }}</p>
         </div>
-
-        <!-- Announcement Card -->
-        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition flex flex-col justify-between h-full">
-          <div>
-            <h3 class="text-lg sm:text-xl font-semibold mb-2 text-black">USG Election Guidelines</h3>
-            <p class="text-sm mb-3 text-black">Posted on June 28, 2025</p>
-            <p class="text-sm sm:text-base text-black">Candidate registration ends July 10. Full details inside.</p>
-          </div>
-          <span class="mt-6 inline-block text-xs text-white bg-[#FF9B45] px-3 py-1 rounded-md self-start">
-            Public
-          </span>
-        </div>
-
-        <!-- Announcement Card -->
-        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition flex flex-col justify-between h-full">
-          <div>
-            <h3 class="text-lg sm:text-xl font-semibold mb-2 text-black">General Assembly: July 20</h3>
-            <p class="text-sm text-black mb-3">Posted on June 25, 2025</p>
-            <p class="text-sm sm:text-base text-black">Open to all students and faculty. Attendance required.</p>
-          </div>
-          <span class="mt-6 inline-block text-xs text-white bg-[#FF9B45] px-3 py-1 rounded-md self-start">
-            For Students Only
-          </span>
-        </div>
-
+        <span class="mt-6 inline-block text-xs text-white bg-[#FF9B45] px-3 py-1 rounded-md self-start">
+          {{ $announcement->visibility ?? 'Public' }}
+        </span>
       </div>
-    </section>
+    @empty
+      <p class="text-center col-span-3 text-gray-500">No announcements available.</p>
+    @endforelse
+  </div>
+</section>
+
 
     <!-- About PSU-Guide CTA Section -->
     <section class="bg-white py-16">
