@@ -15,7 +15,7 @@ class CategorySeeder extends Seeder
         'Registrar Notices',
         'Enrollment Schedules',
         'Academic Deadlines',
-        'Memorandom',
+        'Memorandum',
 
         // USG
         'USG Announcements',

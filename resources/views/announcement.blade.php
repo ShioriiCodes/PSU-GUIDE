@@ -20,15 +20,45 @@
         </button>
       </form>
 
-      {{-- Filter Buttons --}}
-      <div class="flex flex-wrap gap-2 justify-center mb-8">
-        <button data-filter="All" class="filter-btn px-4 py-2 bg-[#D5451B] border border-[#521C0D] text-white rounded">All</button>
-        @foreach ($categories as $category)
-          <button data-filter="{{ $category->name }}" class="filter-btn px-4 py-2 bg-white text-black border border-[#521C0D] rounded">
-            {{ $category->name }}
+      {{-- Responsive Filter Buttons --}}
+      <div class="mb-8">
+        {{-- Mobile: Dropdown toggle --}}
+        <div class="sm:hidden mb-4 text-center">
+          <button onclick="toggleFilterDropdown()" class="px-4 py-2 bg-[#D5451B] text-white border border-[#521C0D] rounded">
+            Filter Categories
           </button>
-        @endforeach
+          <div id="mobileFilterMenu" class="mt-2 hidden flex flex-col items-center gap-2">
+            <button data-filter="All" class="filter-btn px-4 py-2 bg-[#D5451B] border border-[#521C0D] text-white rounded w-3/4">
+              All
+            </button>
+            @foreach ($categories as $category)
+              <button data-filter="{{ $category->name }}" class="filter-btn px-4 py-2 bg-white text-black border border-[#521C0D] rounded w-3/4">
+                {{ $category->name }}
+              </button>
+            @endforeach
+          </div>
+        </div>
+
+        {{-- Desktop: Always visible --}}
+        <div class="hidden sm:flex flex-wrap gap-2 justify-center">
+          <button data-filter="All" class="filter-btn px-4 py-2 bg-[#D5451B] border border-[#521C0D] text-white rounded">
+            All
+          </button>
+          @foreach ($categories as $category)
+            <button data-filter="{{ $category->name }}" class="filter-btn px-4 py-2 bg-white text-black border border-[#521C0D] rounded">
+              {{ $category->name }}
+            </button>
+          @endforeach
+        </div>
       </div>
+
+      {{-- JS to toggle mobile dropdown --}}
+      <script>
+        function toggleFilterDropdown() {
+          const menu = document.getElementById('mobileFilterMenu');
+          menu.classList.toggle('hidden');
+        }
+      </script>
 
       {{-- Announcements Grid --}}
       <div id="announcement-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

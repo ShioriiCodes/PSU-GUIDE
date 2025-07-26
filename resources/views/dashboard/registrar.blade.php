@@ -52,14 +52,17 @@
       <div class="bg-white shadow-md rounded-lg p-6 max-w-3xl">
         <form id="announcementForm" action="{{ route('announcement.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
           @csrf
+
           <div>
             <label class="block text-sm font-medium mb-1">Title</label>
             <input name="title" type="text" class="w-full p-3 border border-gray-800 rounded" placeholder="Enter announcement title" required>
           </div>
+
           <div>
             <label class="block text-sm font-medium mb-1">Message</label>
             <textarea name="content" class="w-full p-3 border border-gray-800 rounded h-40" placeholder="Write the announcement..." required></textarea>
           </div>
+
           <div>
             <label class="block text-sm font-medium mb-1">Category</label>
             @php
@@ -67,7 +70,10 @@
                 'Registrar Notices',
                 'Enrollment Schedules',
                 'Academic Deadlines',
-                'Faculty Meetings & Assemblies'
+                'Memorandum',
+                'Faculty Meetings & Assemblies',
+                'Workshops & Seminars',
+                'Social Gatherings',
               ];
             @endphp
             <select name="category_id" class="w-full p-2 border border-gray-800 rounded" required>
@@ -78,6 +84,13 @@
               @endforeach
             </select>
           </div>
+
+          {{-- ✅ Poster Image Upload --}}
+          <div>
+            <label class="block text-sm font-medium mb-1">Poster Image</label>
+            <input name="poster_image" type="file" accept="image/*" class="w-full p-2 border border-gray-800 rounded">
+          </div>
+
           <button type="submit" class="px-6 py-2 bg-[#D5451B] text-white rounded hover:bg-[#aa3715]">Submit for Approval</button>
         </form>
       </div>
@@ -87,12 +100,15 @@
     <section id="manage" class="panel hidden">
       <h1 class="text-2xl font-bold mb-6">Manage Announcements</h1>
 
+      {{-- Search Bar --}}
       <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <input type="text" id="registrarSearch" onkeyup="filterRegistrarAnnouncements()" 
-        placeholder="Search announcements..." class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" />
+              placeholder="Search announcements..." 
+              class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" />
       </div>
 
-      <div class="bg-white rounded shadow overflow-x-auto">
+      {{-- Table for Desktop --}}
+      <div class="hidden sm:block bg-white rounded shadow overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-100">
             <tr>
@@ -106,41 +122,71 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             @forelse ($announcements as $a)
-            <tr>
-              <td class="px-6 py-4">
-                @if ($a->status === 'approved')
-                  <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
-                @elseif ($a->status === 'rejected')
-                  <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
-                @else
-                  <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
-                @endif
-              </td>
-              <td class="px-6 py-4 font-semibold">{{ $a->title }}</td>
-              <td class="px-6 py-4">{{ $a->category->name ?? '—' }}</td>
-              <td class="px-6 py-4">{{ $a->created_at->format('Y-m-d') }}</td>
-              <td class="px-6 py-4">
-                {{ $a->user->name ?? 'Unknown' }} ({{ $a->user->role ?? 'N/A' }})
-              </td>
-              <td class="px-6 py-4 space-x-2">
-                <a href="{{ route('announcements.show', $a->id) }}" class="text-blue-600 hover:underline">View</a>
-                <a href="{{ route('announcements.edit', $a->id) }}" class="text-yellow-600 hover:underline">Edit</a>
-                <form method="POST" action="{{ route('announcements.destroy', $a->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this announcement?')">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                </form>
-              </td>
-            </tr>
+              <tr>
+                <td class="px-6 py-4">
+                  @if ($a->status === 'approved')
+                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
+                  @elseif ($a->status === 'rejected')
+                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
+                  @else
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
+                  @endif
+                </td>
+                <td class="px-6 py-4 font-semibold">{{ $a->title }}</td>
+                <td class="px-6 py-4">{{ $a->category->name ?? '—' }}</td>
+                <td class="px-6 py-4">{{ $a->created_at->format('Y-m-d') }}</td>
+                <td class="px-6 py-4">{{ $a->user->name ?? 'Unknown' }} ({{ $a->user->role ?? 'N/A' }})</td>
+                <td class="px-6 py-4 space-x-2">
+                  <a href="{{ route('announcements.show', $a->id) }}" class="text-blue-600 hover:underline">View</a>
+                  <a href="{{ route('announcements.edit', $a->id) }}" class="text-yellow-600 hover:underline">Edit</a>
+                  <form method="POST" action="{{ route('announcements.destroy', $a->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this announcement?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                  </form>
+                </td>
+              </tr>
             @empty
-            <tr>
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">No announcements found.</td>
-            </tr>
+              <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No announcements found.</td>
+              </tr>
             @endforelse
           </tbody>
         </table>
       </div>
+
+      {{-- Mobile Cards --}}
+      <div class="sm:hidden space-y-4">
+        @forelse ($announcements as $a)
+          <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-white">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-semibold uppercase text-gray-500">Status</span>
+              <span class="text-xs px-2 py-1 rounded 
+                {{ $a->status === 'approved' ? 'bg-green-100 text-green-700' : 
+                  ($a->status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
+                {{ ucfirst($a->status) }}
+              </span>
+            </div>
+            <div class="text-sm mb-1"><strong>Title:</strong> {{ $a->title }}</div>
+            <div class="text-sm mb-1"><strong>Category:</strong> {{ $a->category->name ?? '—' }}</div>
+            <div class="text-sm mb-1"><strong>Date:</strong> {{ $a->created_at->format('Y-m-d') }}</div>
+            <div class="text-sm mb-3"><strong>Posted By:</strong> {{ $a->user->name ?? 'Unknown' }} ({{ $a->user->role ?? 'N/A' }})</div>
+            <div class="flex flex-wrap gap-3 text-sm">
+              <a href="{{ route('announcements.show', $a->id) }}" class="text-blue-600 hover:underline">View</a>
+              <a href="{{ route('announcements.edit', $a->id) }}" class="text-yellow-600 hover:underline">Edit</a>
+              <form method="POST" action="{{ route('announcements.destroy', $a->id) }}" onsubmit="return confirm('Are you sure you want to delete this announcement?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="text-red-600 hover:underline">Delete</button>
+              </form>
+            </div>
+          </div>
+        @empty
+          <p class="text-gray-500 text-center">No announcements found.</p>
+        @endforelse
+      </div>
     </section>
+
 
     <!-- Users Panel -->
     <section id="users" class="panel hidden">

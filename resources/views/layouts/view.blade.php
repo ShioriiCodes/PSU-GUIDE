@@ -15,16 +15,17 @@
 <!-- Optional Header -->
 <header class="bg-white shadow-md py-6 px-6 flex justify-center items-center">
     <div class="flex items-center w-full max-w-3xl mx-auto">
-        <img src="{{asset('logo/logo2-1.png')}}" alt="PSU Logo" class="h-12 w-12 mr-4">
+        <img src="{{asset('logo/logo2-1.png')}}" alt="PSU-GUIDE LOGO" class="h-16 w-auto mr-4">
         <h1 class="text-3xl font-extrabold text-gray-800 text-center flex-1">
             @yield('header', 'PSU-GUIDE')
         </h1>
-        <img src="{{asset('logo/logo2-1.png')}}" alt="PSU Logo" class="h-12 w-12 ml-4">
+        <img src="{{asset('logo/PSU_Logo.png')}}" alt="PSU LOGO" class="h-16 w-auto ml-4 text-black">
     </div>
 </header>
 
     <!-- Main Content -->
-    <main class="flex-1 px-6 py-8 bg-[#F4E7E1] h-screen">
+    <main class="flex-1 px-6 py-8 bg-[#F4E7E1] min-h-screen">
+
         @yield('content')
     </main>
 
@@ -33,7 +34,6 @@
         © 2025 PSU-GUIDE | Palawan State University Quezon Campus<br>
         Contact: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=psuguide.info@gmail.com" target="_blank" rel="noopener" class="underline     hover:text-[#FF9B45] transition">
             psuguide.info@gmail.com</a>
-        
     </footer>
 
 </body>

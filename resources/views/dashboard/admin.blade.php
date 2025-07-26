@@ -596,6 +596,7 @@
                     </tbody>
                 </table>
             </div>
+            
 
         <!-- Import Students Form -->
         <div id="importStudentForm" class="bg-white p-6 rounded shadow max-w-xl hidden">
@@ -615,6 +616,7 @@
 
             <p class="text-sm text-gray-500 mt-4">Name and password will be based on the part before the "@". Department will be detected (e.g., BSIT, HM, BSED).</p>
         </div>
+            
     </section>
 
         <!-- Faculty Accounts Panel -->
@@ -818,14 +820,14 @@
         <h1 class="text-2xl font-bold mb-6">Activity Logs</h1>
             <p class="text-gray-700 mb-4">Track recent activities and system changes performed by users and moderators.</p>
             <div class="flex items-center justify-end gap-2 px-4 pb-4">
-                <a href="{{ route('activityLogs.export', 'pdf') }}" target="_blank"
+                {{-- <a href="{{ route('activityLogs.export', 'pdf') }}" target="_blank"
                     class="inline-block px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition">
                     Download PDF
                 </a>
                 <a href="{{ route('activityLogs.export', 'docx') }}" target="_blank"
                     class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
                     Download DOCX
-                </a>
+                </a> --}}
                 <a href="{{ route('activityLogs.export', 'excel') }}" target="_blank"
                     class="inline-block px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">
                     Download Excel
@@ -899,6 +901,7 @@
     </main>
 
 </div>
+
 
         <script src="//unpkg.com/alpinejs" defer></script>
         <script src="{{ asset('js/admin.js') }}"></script>

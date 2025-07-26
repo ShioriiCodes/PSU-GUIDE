@@ -94,7 +94,7 @@
       <p class="text-sm sm:text-base max-w-2xl mx-auto mb-6">
         This platform is more than just a website — it's a solution. PSU-GUIDE bridges communication gaps, promotes transparency, and helps students stay informed and connected with what’s happening in our campus.
       </p>
-      <a href="contact.html"
+      <a href="{{ route('contact') }}"
         class="inline-block bg-[#D5451B] text-white px-6 py-3 rounded-md hover:bg-[#FF9B45] transition">
         Learn More About This Project
       </a>

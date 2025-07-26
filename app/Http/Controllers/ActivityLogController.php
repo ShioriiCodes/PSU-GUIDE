@@ -10,6 +10,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Models\User; 
 use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ActivityLogController extends Controller
 {
@@ -108,6 +110,29 @@ class ActivityLogController extends Controller
 
         // Return response
         return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
+    }
+    
+
+    public function index(Request $request)
+    {
+        $logs = ActivityLog::with('user');
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $logs->whereHas('user', fn ($q) => $q->where('role', $request->role));
+        }
+
+        // ✅ Filter by date range
+        if ($request->filled('from') && $request->filled('to')) {
+            $logs->whereBetween('timestamp', [
+                Carbon::parse($request->from)->startOfDay(),
+                Carbon::parse($request->to)->endOfDay()
+            ]);
+        }
+
+        $logs = $logs->latest()->paginate(20);
+
+        return view('logs.index', compact('logs'));
     }
 
 

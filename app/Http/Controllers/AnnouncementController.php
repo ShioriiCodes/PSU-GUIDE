@@ -26,7 +26,7 @@ class AnnouncementController extends Controller
             $search = $request->search;
             $announcements = $announcements->where(function ($query) use ($search) {
                 $query->where('title', 'like', "%{$search}%")
-                      ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
 
@@ -136,14 +136,38 @@ class AnnouncementController extends Controller
             'approved_at'     => now(),
         ]);
 
+        // ✅ Log approval to activity_logs
+        ActivityLog::create([
+            'user_id'     => Auth::id(), // admin who approved
+            'action'      => 'approved',
+            'target_type' => Announcement::class,
+            'target_id'   => $announcement->id,
+            'timestamp'   => now(),
+        ]);
+
         return back()->with('success', 'Announcement approved successfully.');
     }
+
 
     public function reject($id)
     {
         $announcement = Announcement::findOrFail($id);
+
+        if ($announcement->status !== 'pending') {
+            return back()->with('error', 'This announcement has already been processed.');
+        }
+
         $announcement->status = 'rejected';
         $announcement->save();
+
+        // ✅ Log rejection to activity_logs
+        \App\Models\ActivityLog::create([
+            'user_id'     => Auth::id(), // admin who rejected
+            'action'      => 'rejected',
+            'target_type' => \App\Models\Announcement::class,
+            'target_id'   => $announcement->id,
+            'timestamp'   => now(),
+        ]);
 
         return back()->with('success', 'Announcement rejected.');
     }
@@ -151,14 +175,20 @@ class AnnouncementController extends Controller
     public function show($id)
     {
         $announcement = Announcement::with([
-            'user',
-            'category',
-            'comments.user',
-            'comments.replies.user'
+            'user', 'category', 'comments.user', 'comments.replies.user'
         ])->findOrFail($id);
+
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'action'      => 'viewed',
+            'target_type' => Announcement::class,
+            'target_id'   => $id,
+            'timestamp'   => now(),
+        ]);
 
         return view('announcements.show', compact('announcement'));
     }
+
 
     public function loadComments($id)
     {
@@ -201,6 +231,14 @@ class AnnouncementController extends Controller
             'title' => $request->title,
             'content' => $request->content,
             'category_id' => $request->category_id,
+        ]);
+        
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'action'      => 'edited',
+            'target_type' => Announcement::class,
+            'target_id'   => $announcement->id,
+            'timestamp'   => now(),
         ]);
 
         return redirect()->route('announcements.show', $announcement->id)->with('success', 'Announcement updated.');

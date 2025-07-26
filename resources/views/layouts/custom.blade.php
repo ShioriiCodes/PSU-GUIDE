@@ -134,6 +134,15 @@
         </div>
     </nav>
 
+    {{-- Floating Scroll to Top Button --}}
+    <button onclick="scrollToTop()"
+            id="scrollTopBtn"
+            class="fixed bottom-5 right-5 z-50 bg-[#D5451B] hover:bg-[#aa3715] text-white p-3 rounded-full shadow-lg hidden transition duration-300 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
     <!-- Page Content -->
     @yield('content')
 
@@ -148,6 +157,22 @@
 
     <script src="{{ asset('js/script.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+    // Show button when scrolling down
+    window.addEventListener('scroll', () => {
+        const scrollBtn = document.getElementById('scrollTopBtn');
+        if (window.scrollY > 300) {
+        scrollBtn.classList.remove('hidden');
+        } else {
+        scrollBtn.classList.add('hidden');
+        }
+    });
+
+    // Scroll to top smoothly
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    </script>
 
 </body>
 </html>

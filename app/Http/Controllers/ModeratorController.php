@@ -85,50 +85,53 @@ class ModeratorController extends Controller
 
         return back()->with('error', 'Export format not supported.');
     }
+    
 
     public function usgDashboard()
-{
-    // ✅ Fetch only USG-allowed categories
-    $categories = Category::whereIn('name', [
-        'USG Announcements',
-        'Student Activities'
-    ])->get();
+    {
+        // ✅ Fetch only USG-allowed categories
+        $categories = Category::whereIn('name', [
+            'USG Announcements',
+            'Student Activities',
+            'Workshops & Seminars',
+            'Social Gatherings'
+        ])->get();
 
-    // ✅ Announcements posted by the current USG user
-    $announcements = Announcement::with(['user', 'category'])
-        ->whereHas('user', function ($q) {
-            $q->whereIn('role', ['admin', 'registrar', 'usg']);
-        })
-        ->latest()
-        ->get();
+        // ✅ Announcements posted by the current USG user
+        $announcements = Announcement::with(['user', 'category'])
+            ->whereHas('user', function ($q) {
+                $q->whereIn('role', ['admin', 'registrar', 'usg']);
+            })
+            ->latest()
+            ->get();
 
-    // ✅ Basic user stats
-    $admins = User::where('role', 'admin')->count();
-    $registrars = User::where('role', 'registrar')->count();
-    $usgs = User::where('role', 'usg')->count();
-    $faculty = User::where('role', 'faculty')->count();
-    $students = User::where('role', 'student')->count();
+        // ✅ Basic user stats
+        $admins = User::where('role', 'admin')->count();
+        $registrars = User::where('role', 'registrar')->count();
+        $usgs = User::where('role', 'usg')->count();
+        $faculty = User::where('role', 'faculty')->count();
+        $students = User::where('role', 'student')->count();
 
-    // ✅ Announcement status stats
-    $total = $announcements->count();
-    $approved = $announcements->where('status', 'approved')->count();
-    $pending = $announcements->where('status', 'pending')->count();
-    $rejected = $announcements->where('status', 'rejected')->count();
+        // ✅ Announcement status stats
+        $total = $announcements->count();
+        $approved = $announcements->where('status', 'approved')->count();
+        $pending = $announcements->where('status', 'pending')->count();
+        $rejected = $announcements->where('status', 'rejected')->count();
 
-    // ✅ Render Blade view with all required data
-    return view('dashboard.usg', compact(
-        'categories',
-        'announcements',
-        'admins',
-        'registrars',
-        'usgs',
-        'faculty',
-        'students',
-        'total',
-        'approved',
-        'pending',
-        'rejected'
-    ));
-}
+        // ✅ Render Blade view with all required data
+        return view('dashboard.usg', compact(
+            'categories',
+            'announcements',
+            'admins',
+            'registrars',
+            'usgs',
+            'faculty',
+            'students',
+            'total',
+            'approved',
+            'pending',
+            'rejected'
+        ));
+    }
 
 }

@@ -152,3 +152,7 @@ Route::get('/notifications/mark-read', function () {
 Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
 
 Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
+
+
+Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
+Route::get('/logs/export/{type}', [ActivityLogController::class, 'export'])->name('logs.export');
