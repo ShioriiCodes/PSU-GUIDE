@@ -54,6 +54,7 @@
             const userName = deleteFormToSubmit.dataset.name || 'this account';
             document.getElementById('deleteTargetName').textContent = userName;
             document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex', 'items-center', 'justify-center');
             return false;
         }
 

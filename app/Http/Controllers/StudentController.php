@@ -83,12 +83,6 @@ class StudentController extends Controller
         }
     }
 
-    public function edit($id)
-    {
-        $student = User::where('role', 'student')->findOrFail($id);
-        return view('students.edit', compact('student'));
-    }
-
     public function toggleStatus($id)
     {
         $student = User::findOrFail($id);

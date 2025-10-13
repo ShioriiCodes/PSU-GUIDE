@@ -85,22 +85,22 @@ class ModeratorController extends Controller
 
         return back()->with('error', 'Export format not supported.');
     }
-    
+
+
 
     public function usgDashboard()
     {
         // ✅ Fetch only USG-allowed categories
         $categories = Category::whereIn('name', [
             'USG Announcements',
-            'Student Activities',
             'Workshops & Seminars',
-            'Social Gatherings'
+            'Campus Spotlights',
         ])->get();
 
-        // ✅ Announcements posted by the current USG user
+        // ✅ Announcements posted by USG users only
         $announcements = Announcement::with(['user', 'category'])
             ->whereHas('user', function ($q) {
-                $q->whereIn('role', ['admin', 'registrar', 'usg']);
+                $q->where('role', 'usg');
             })
             ->latest()
             ->get();

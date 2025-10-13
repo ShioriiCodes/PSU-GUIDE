@@ -34,12 +34,20 @@ class ProfileController extends Controller
 
             // Handle profile picture upload if present
             if ($request->hasFile('profile_picture')) {
-                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-                $data['profile_picture'] = $path;
+                $file = $request->file('profile_picture');
+                $filename = time() . '_' . $file->getClientOriginalName();
+
+                // Store directly in public/storage/profile_pictures for Windows compatibility
+                $destinationPath = public_path('storage/profile_pictures');
+                $file->move($destinationPath, $filename);
+                $data['profile_picture'] = 'profile_pictures/' . $filename;
 
                 // Optional: delete old picture
                 if ($user->profile_picture) {
-                    Storage::disk('public')->delete($user->profile_picture);
+                    $oldPath = public_path('storage/' . $user->profile_picture);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
                 }
             }
 
@@ -53,6 +61,7 @@ class ProfileController extends Controller
 
             return Redirect::route('profile.edit')->with('status', 'profile-updated');
         }
+        
     /**
      * Delete the user's account.
      */

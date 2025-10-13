@@ -13,23 +13,18 @@ class CategorySeeder extends Seeder
     $categories = [
         // Registrar
         'Registrar Notices',
-        'Enrollment Schedules',
-        'Academic Deadlines',
+        'Enrollment Updates',
         'Memorandum',
 
         // USG
         'USG Announcements',
-        'Student Activities',
 
         // Admin
-        'Campus Updates',
-        'Campus Events',
         'Workshops & Seminars',
-        'Social Gatherings',
+        'Campus Spotlights',
 
-        // Faculty
-        'Faculty Meetings',
-        'Emergency Faculty Meetings',
+        // Others (for custom categories)
+        'Others',
     ];
 
         foreach ($categories as $name) {

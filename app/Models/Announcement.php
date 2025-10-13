@@ -16,11 +16,13 @@ use Illuminate\Database\Eloquent\Model;
         'title',
         'content',
         'category_id',
+        'custom_category',
         'is_approved',
         'posted_by',
         'status',
         'poster_image'
     ];
+
 
     protected static function booted()
     {
@@ -44,13 +46,18 @@ use Illuminate\Database\Eloquent\Model;
     
     public function getTitle()
     {
+
         return $this->title;
     }
-    
+
+    public function approvals()
+    {
+        return $this->hasMany(Approval::class);
+    }
 
     public function comments()
     {
-        return $this->hasMany(Comment::class)->whereNull('parent_id')->latest();
+        return $this->hasMany(Comment::class);
     }
 
 }

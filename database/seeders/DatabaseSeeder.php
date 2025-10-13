@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             DepartmentSeeder::class,
+            CategorySeeder::class,
         ]);
         // Delete existing accounts (if re-running)
         User::whereIn('email', [

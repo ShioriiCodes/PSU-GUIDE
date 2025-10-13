@@ -26,8 +26,8 @@
       </div>
       <nav class="space-y-3" id="sidebarNav">
         <button class="block w-full text-left py-2 px-4 rounded bg-[#E17C5F] text-white" onclick="showTab('personal', this)">Personal Info</button>
-        <button class="block w-full text-left py-2 px-4 rounded hover:bg-[#E17C5F]" onclick="showTab('security', this)">Security</button>
-        <button class="block w-full text-left py-2 px-4 rounded hover:bg-[#E17C5F]" onclick="showTab('preferences', this)">Preferences</button>
+        {{-- <button class="block w-full text-left py-2 px-4 rounded hover:bg-[#E17C5F]" onclick="showTab('security', this)">Security</button> --}}
+        {{-- <button class="block w-full text-left py-2 px-4 rounded hover:bg-[#E17C5F]" onclick="showTab('preferences', this)">Preferences</button> --}}
         <button class="block w-full text-left py-2 px-4 rounded hover:bg-[#E17C5F]" onclick="showTab('legal', this)">Legal</button>
         <form method="POST" action="{{ route('logout') }}">
           @csrf
@@ -128,7 +128,7 @@
       </div>
 
       <!-- Security Section -->
-      <div id="security" class="tab hidden">
+      {{-- <div id="security" class="tab hidden">
         <h2 class="text-2xl font-bold mb-4">Security Settings</h2>
           <form id="passwordForm" action="{{ route('user.updatePassword') }}" method="POST" class="space-y-6 max-w-xl">
             @csrf
@@ -172,10 +172,10 @@
             }
           });
         </script>
-        </div>
+        </div> --}}
 
       <!-- Preferences Section -->
-        <div id="preferences" class="tab hidden">
+        {{-- <div id="preferences" class="tab hidden">
           <h2 class="text-2xl font-bold mb-6">User Preferences</h2>
 
           @if (session('success_preferences'))
@@ -213,7 +213,7 @@
               Save Preferences
             </button>
           </form>
-        </div>
+        </div> --}}
 
       <!-- Legal Section -->
       <div id="legal" class="tab hidden">

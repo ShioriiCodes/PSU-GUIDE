@@ -4,43 +4,82 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>USG Moderator Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/png">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .nav-btn {
+      transition: all 0.3s ease;
+    }
+    .panel {
+      min-height: 100vh;
+    }
+    .shadow-custom {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+  </style>
 </head>
-<body class="bg-[#F4E7E1] font-poppins">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
 
   <div class="min-h-screen flex flex-col md:flex-row relative">
-    <button id="toggleSidebar" class="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded shadow">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <button id="toggleSidebar" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-custom">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
     </button>
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-full md:w-64 bg-white shadow-md p-6 space-y-4 fixed md:static top-0 left-0 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
-      <div class="flex items-center gap-4 mb-6">
-        <a href="/" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300" title="Back to Home">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <aside id="sidebar" class="w-full md:w-72 bg-white shadow-xl p-6 space-y-6 fixed md:static top-0 left-0 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-3">
+      <div class="flex items-center gap-4 mb-8">
+        <a href="/" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 hover:bg-slate-300 transition" title="Back to Home">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </a>
-        <h2 class="text-xl font-semibold">USG Panel</h2>
+        <h2 class="text-xl font-bold text-slate-800">USG Panel</h2>
       </div>
-      <nav class="space-y-2">
-        <button id="btn-stats" onclick="showPanel('stats')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F] bg-[#E17C5F] text-white">Statistics</button>
-        <button id="btn-create" onclick="showPanel('create')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F] ">Post Announcement</button>
-        <button id="btn-manage" onclick="showPanel('manage')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Manage Posts</button>
-        <button id="btn-users" onclick="showPanel('users')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">View Users</button>
-        <button id="btn-settings" onclick="showPanel('settings')" class="nav-btn block w-full text-left px-4 py-2 rounded hover:bg-[#E17C5F]">Settings</button>
+      <nav class="space-y-3">
+        <button id="btn-stats" onclick="showPanel('stats')" class="nav-btn w-full text-left px-4 py-3 rounded-lg  hover:bg-slate-200 transition flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          Statistics
+        </button>
+        <button id="btn-create" onclick="showPanel('create')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-200 transition flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Post Announcement
+        </button>
+        <button id="btn-manage" onclick="showPanel('manage')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-200 transition flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          All Posts
+        </button>
+        <button id="btn-settings" onclick="showPanel('settings')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-200 transition flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Settings
+        </button>
         <form id="logout-form" action="{{ route('logout') }}" method="POST">
           @csrf
-          <button type="submit" class="nav-btn block w-full text-left px-4 py-2 rounded text-red-500 hover:bg-red-100">Logout</button>
+          <button type="submit" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            Logout
+          </button>
         </form>
       </nav>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-8">
+    <main class="flex-1 p-4 sm:p-6 md:p-8 z-10">
 
         <!-- CREATE Announcement Panel -->
     <section id="create" class="panel hidden">
@@ -71,33 +110,33 @@
                   required>
           </div>
 
-          <!-- Message -->
+          <!-- Poster Image or PDF -->
           <div>
-            <label class="block text-sm font-medium mb-1">Message</label>
-            <textarea name="content"
-                      class="w-full p-3 border border-gray-800 rounded h-40 resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
-                      placeholder="Write the announcement..."
-                      required></textarea>
+            <label class="block text-sm font-medium mb-1">Poster Image or PDF</label>
+            <input name="poster_image" type="file"
+                  accept="image/*,.pdf"
+                  class="w-full p-3 border border-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-orange-400">
+            <p class="text-xs text-gray-500 mt-1">Accepted formats: Images (JPG, PNG, etc.) and PDF files.</p>
           </div>
 
-          <!-- Category and Image Upload -->
+          <!-- Category and Custom Category -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-sm font-medium mb-1">Category</label>
-              <select name="category_id"
+              <select name="category_id" id="category_id"
                       class="w-full p-3 border border-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
-                      required>
+                      required onchange="toggleCustomCategory()">
                 @foreach($categories as $category)
                   <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
               </select>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium mb-1">Poster Image</label>
-              <input name="poster_image" type="file"
-                    accept="image/*"
-                    class="w-full p-3 border border-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-orange-400">
+            <div id="customCategoryDiv" class="hidden">
+              <label class="block text-sm font-medium mb-1">Custom Category</label>
+              <input name="custom_category" type="text" id="custom_category"
+                    class="w-full p-3 border border-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    placeholder="Enter custom category name">
             </div>
           </div>
 
@@ -114,7 +153,7 @@
 
       <!-- MANAGE Posts Panel -->
     <section id="manage" class="panel hidden">
-      <h1 class="text-2xl font-bold mb-6">Manage Announcements</h1>
+      <h1 class="text-2xl font-bold mb-6">All My Posts</h1>
 
       <!-- Search bar -->
       <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -152,23 +191,24 @@
                       @endif
                     </td>
                     <td class="px-4 py-3 font-semibold break-words max-w-[12rem]">{{ $a->title }}</td>
-                    <td class="px-4 py-3">{{ $a->category->name ?? '—' }}</td>
+                    <td class="px-4 py-3">{{ $a->category->name ?? '—' }}{{ $a->custom_category ? ' (' . $a->custom_category . ')' : '' }}</td>
                     <td class="px-4 py-3">{{ $a->created_at->format('Y-m-d') }}</td>
                     <td class="px-4 py-3">
                       {{ $a->user->name ?? 'Unknown' }}<br />
                       <span class="text-xs text-gray-500">({{ $a->user->role ?? 'N/A' }})</span>
                     </td>
                     <td class="px-4 py-3 space-x-2 text-sm">
-                      <a href="{{ route('announcements.show', $a->id) }}" class="text-blue-600 hover:underline">View</a>
-                      <a href="{{ route('announcements.edit', $a->id) }}" class="text-yellow-600 hover:underline">Edit</a>
-                      <form method="POST"
-                            action="{{ route('announcements.destroy', $a->id) }}"
-                            class="inline"
-                            onsubmit="return confirm('Are you sure you want to delete this announcement?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                      </form>
+                      @if($a->status === 'rejected')
+                        @php
+                          $approval = $a->approvals()->where('status', 'rejected')->first();
+                        @endphp
+                        <button onclick="showRejectionReasonModal('{{ $approval->rejection_reason ?? 'No reason provided' }}')"
+                               class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200 transition">
+                          View Reason
+                        </button>
+                        <a href="{{ route('announcements.edit', $a->id) }}" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded hover:bg-yellow-200 transition">Edit</a>
+                      @endif
+                      <a href="{{ route('announcements.show', $a->id) }}" class="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded hover:bg-blue-200 transition">View</a>
                     </td>
                   </tr>
                 @empty
@@ -186,27 +226,28 @@
               <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-white">
                 <div class="flex justify-between items-center mb-2">
                   <span class="text-xs font-semibold uppercase text-gray-500">Status:</span>
-                  <span class="text-xs px-2 py-1 rounded 
-                    {{ $a->status === 'approved' ? 'bg-green-100 text-green-700' : 
+                  <span class="text-xs px-2 py-1 rounded
+                    {{ $a->status === 'approved' ? 'bg-green-100 text-green-700' :
                       ($a->status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
                     {{ ucfirst($a->status) }}
                   </span>
                 </div>
                 <div class="text-sm mb-1"><strong>Title:</strong> {{ $a->title }}</div>
-                <div class="text-sm mb-1"><strong>Category:</strong> {{ $a->category->name ?? '—' }}</div>
+                <div class="text-sm mb-1"><strong>Category:</strong> {{ $a->category->name ?? '—' }}{{ $a->custom_category ? ' (' . $a->custom_category . ')' : '' }}</div>
                 <div class="text-sm mb-1"><strong>Date:</strong> {{ $a->created_at->format('Y-m-d') }}</div>
                 <div class="text-sm mb-3"><strong>Posted By:</strong> {{ $a->user->name ?? 'Unknown' }} ({{ $a->user->role ?? 'N/A' }})</div>
                 <div class="flex flex-wrap gap-3 text-sm">
-                  <a href="{{ route('announcements.show', $a->id) }}" class="text-blue-600 hover:underline">View</a>
-                  <a href="{{ route('announcements.edit', $a->id) }}" class="text-yellow-600 hover:underline">Edit</a>
-                  <form method="POST"
-                        action="{{ route('announcements.destroy', $a->id) }}"
-                        class="inline"
-                        onsubmit="return confirm('Are you sure you want to delete this announcement?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                  </form>
+                  @if($a->status === 'rejected')
+                    @php
+                      $approval = $a->approvals()->where('status', 'rejected')->first();
+                    @endphp
+                    <button onclick="showRejectionReasonModal('{{ $approval->rejection_reason ?? 'No reason provided' }}')"
+                           class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200 transition">
+                      View Reason
+                    </button>
+                    <a href="{{ route('announcements.edit', $a->id) }}" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded hover:bg-yellow-200 transition">Edit</a>
+                  @endif
+                  <a href="{{ route('announcements.show', $a->id) }}" class="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded hover:bg-blue-200 transition">View</a>
                 </div>
               </div>
             @empty
@@ -217,54 +258,62 @@
       </div>
     </section>
 
-  <!-- USERS Panel -->
-  <section id="users" class="panel hidden">
-    <h1 class="text-2xl font-bold mb-6">Users</h1>
-    <div class="flex flex-wrap gap-4">
-      <div class="bg-white p-4 rounded-md shadow w-full sm:w-60 h-32 flex items-center justify-center text-center">
-        <div><p class="text-lg font-semibold">Admins</p><p class="text-gray-600">{{ $admins }}</p></div>
-      </div>
-      <div class="bg-white p-4 rounded-md shadow w-full sm:w-60 h-32 flex items-center justify-center text-center">
-        <div><p class="text-lg font-semibold">Registrars</p><p class="text-gray-600">{{ $registrars }}</p></div>
-      </div>
-      <div class="bg-white p-4 rounded-md shadow w-full sm:w-60 h-32 flex items-center justify-center text-center">
-        <div><p class="text-lg font-semibold">USG Members</p><p class="text-gray-600">{{ $usgs }}</p></div>
-      </div>
-      <div class="bg-white p-4 rounded-md shadow w-full sm:w-60 h-32 flex items-center justify-center text-center">
-        <div><p class="text-lg font-semibold">Faculty</p><p class="text-gray-600">{{ $faculty }}</p></div>
-      </div>
-      <div class="bg-white p-4 rounded-md shadow w-full sm:w-60 h-32 flex items-center justify-center text-center">
-        <div><p class="text-lg font-semibold">Students</p><p class="text-gray-600">{{ $students }}</p></div>
-      </div>
+    <!-- Rejection Reason Modal -->
+    <div id="rejectionReasonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[80] px-4">
+        <div class="bg-white p-8 rounded-2xl w-full max-w-2xl shadow-2xl relative">
+            <button onclick="closeRejectionReasonModal()"
+                    class="absolute top-4 right-6 text-gray-400 hover:text-black text-3xl font-bold transition z-[90]">
+                &times;
+            </button>
+
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Rejection Reason</h2>
+
+            <div class="mb-6">
+                <p id="rejectionReasonContent" class="text-gray-700 leading-relaxed whitespace-pre-line">
+                    Rejection reason will appear here...
+                </p>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" onclick="closeRejectionReasonModal()"
+                        class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+                    Close
+                </button>
+            </div>
+        </div>
     </div>
-  </section>
 
   <!-- STATS Panel -->
   <section id="stats" class="panel rounded-md">
-    <h1 class="text-2xl font-bold mb-6">Announcement Statistics</h1>
-    <div class="bg-white border border-gray-300 rounded-md overflow-hidden max-w-lg ml-0">
+    <h1 class="text-3xl font-bold mb-8 text-slate-800">Announcement Statistics</h1>
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden max-w-lg ml-0 shadow-custom">
       <table class="w-full">
-        <thead class="bg-gray-100">
+        <thead class="bg-slate-100">
           <tr>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Metric</th>
-            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Count</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              Metric
+            </th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Count</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="bg-white divide-y divide-slate-200">
           <tr>
-            <td class="px-6 py-4 text-gray-800 font-medium">Total Announcements</td>
+            <td class="px-6 py-4 text-slate-800 font-medium">Total Announcements</td>
             <td class="px-6 py-4">{{ $total }}</td>
           </tr>
           <tr>
-            <td class="px-6 py-4 text-gray-800 font-medium">Approved</td>
+            <td class="px-6 py-4 text-slate-800 font-medium">Approved</td>
             <td class="px-6 py-4 text-green-600 font-semibold">{{ $approved }}</td>
           </tr>
           <tr>
-            <td class="px-6 py-4 text-gray-800 font-medium">Pending</td>
+            <td class="px-6 py-4 text-slate-800 font-medium">Pending</td>
             <td class="px-6 py-4 text-yellow-600 font-semibold">{{ $pending }}</td>
           </tr>
           <tr>
-            <td class="px-6 py-4 text-gray-800 font-medium">Rejected</td>
+            <td class="px-6 py-4 text-slate-800 font-medium">Rejected</td>
             <td class="px-6 py-4 text-red-600 font-semibold">{{ $rejected }}</td>
           </tr>
         </tbody>
@@ -299,7 +348,7 @@
           </div>
         </form>
       </div>
-      <!-- Password Change -->
+      {{-- <!-- Password Change -->
       <div class="bg-white p-6 rounded shadow border">
         <form method="POST" action="{{ route('admin.updatePassword') }}" class="space-y-6">
           @csrf
@@ -321,7 +370,7 @@
             <button class="px-4 py-2 bg-[#E17C5F] text-white rounded hover:bg-[#c05e4d]">Save Password</button>
           </div>
         </form>
-      </div>
+      </div> --}}
     </div>
   </section>
       <!-- Replace this comment with the panels from the Registrar layout -->
@@ -330,5 +379,33 @@
   </div>
 
   <script src="{{ asset('js/moderatos.js') }}"></script>
+
+  <script>
+    function toggleCustomCategory() {
+      const categorySelect = document.getElementById('category_id');
+      const customCategoryDiv = document.getElementById('customCategoryDiv');
+      const customCategoryInput = document.getElementById('custom_category');
+
+      if (categorySelect.options[categorySelect.selectedIndex].text === 'Others') {
+        customCategoryDiv.classList.remove('hidden');
+        customCategoryInput.required = true;
+      } else {
+        customCategoryDiv.classList.add('hidden');
+        customCategoryInput.required = false;
+        customCategoryInput.value = '';
+      }
+    }
+
+    function showRejectionReasonModal(reason) {
+        document.getElementById('rejectionReasonContent').textContent = reason;
+        document.getElementById('rejectionReasonModal').classList.remove('hidden');
+        document.getElementById('rejectionReasonModal').classList.add('flex');
+    }
+
+    function closeRejectionReasonModal() {
+        document.getElementById('rejectionReasonModal').classList.add('hidden');
+        document.getElementById('rejectionReasonModal').classList.remove('flex');
+    }
+  </script>
 </body>
 </html>

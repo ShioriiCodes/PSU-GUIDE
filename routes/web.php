@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserSetupController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminImportController;
 use App\Http\Controllers\AdminDashboardController;
@@ -12,11 +11,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModeratorController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UserProfileController;
 use App\Models\Announcement;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\AnnouncementStatsController;
 
 
 // User Routes
@@ -24,8 +26,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
     Route::put('/profile/update', [UserController::class, 'update'])->name('user.update')->middleware('auth');
     Route::put('/user/update-password', [UserController::class, 'updatePassword'])->name('user.updatePassword');
-    // Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
-    // Route::put('/profile/update', [UserController::class, 'update'])->name('user.update');  
     Route::put('/user/preferences', [UserController::class, 'updatePreferences'])->name('user.preferences.update');;
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
@@ -43,7 +43,6 @@ Route::get('/about', function () {
 
 Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement');
 Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcement.store');
-
 
 Route::get('/contact', function () {
     return view('contact');
@@ -66,29 +65,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/announcements/{id}', [AnnouncementController::class, 'show'])->name('announcements.show');
     Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
     Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
-    Route::get('/announcement/{id}/full', [AnnouncementController::class, 'loadFull'])->name('announcement.full');
+    Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
+
 });
+
+Route::get('/account/{id}/edit', [UserProfileController::class, 'edit'])->name('account.edit');
+Route::put('/account/{id}', [UserProfileController::class, 'update'])->name('account.update');
+
+Route::get('/announcement/{id}/full', [AnnouncementController::class, 'loadFull'])->name('announcement.full');
 
 // Registrar and USG Routes
 Route::middleware(['auth'])->group(function () {
-    Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/registrar', [\App\Http\Controllers\AnnouncementController::class, 'allPosts'])
         ->name('dashboard.registrar');
     Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcement.store');
     Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
     Route::put('/admin/profile/update', [AdminController::class, 'update'])->name('admin.update');
-});
 
     Route::get('/usg', function () {
         return view('dashboard.usg');
     })->name('dashboard.usg');
 });
 
-
 Route::get('/activity-logs/export/{format}', [ActivityLogController::class, 'export'])->name('activityLogs.export');
-
-// Setup Users (for testing or initial setup)
-Route::get('/setup-users', [UserSetupController::class, 'insertTestUsers']);
 
 // Faculty Export Route
 Route::post('/faculty/{id}/export', [FacultyController::class, 'export'])->name('faculty.export');
@@ -98,14 +97,13 @@ Route::post('/moderators/{id}/export', [ModeratorController::class, 'export'])->
 
 Route::get('/dashboard/usg', [ModeratorController::class, 'usgDashboard'])->name('dashboard.usg');
 
-
 Route::get('/test-model', function () {
     return Announcement::count();
 });
+
 // Faculty Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/faculty/{id}', [FacultyController::class, 'show'])->name('faculty.show');
-
     // View single student
     Route::get('/students/{id}', [StudentController::class, 'show'])->name('students.show');
     // Edit student
@@ -118,41 +116,40 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/accounts/{id}', [StudentController::class, 'destroy'])->name('accounts.destroy');
 });
 
-// comment
-Route::middleware(['auth'])->group(function () {
-    
+    // comment
     Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comments.edit');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/comments/{comment}/like', [CommentController::class, 'like'])->name('comments.like');
+    Route::post('/comments/{comment}/reply', [CommentController::class, 'reply'])->name('comments.reply');
     Route::get('/announcement/{id}/comments', [AnnouncementController::class, 'loadComments'])->name('announcement.comments');
 
-});
+    // in routes/web.php
+    Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// in routes/web.php
-Route::get('/', [HomeController::class, 'index'])->name('home');
+    // Dashboard Route (Smart Redirection Based on Role)
+    Route::middleware(['auth'])->get('/dashboard', function () {
+        $role = Auth::user()->role;
 
-// Dashboard Route (Smart Redirection Based on Role)
-Route::middleware(['auth'])->get('/dashboard', function () {
-    $role = Auth::user()->role;
+        return match ($role) {
+            'admin' => redirect()->route('dashboard.admin'),
+            'registrar' => redirect()->route('dashboard.registrar'),
+            'usg' => redirect()->route('dashboard.usg'),
+            default => redirect('/'),
+        };
+    })->name('dashboard');
 
-    return match ($role) {
-        'admin' => redirect()->route('dashboard.admin'),
-        'registrar' => redirect()->route('dashboard.registrar'),
-        'usg' => redirect()->route('dashboard.usg'),
-        default => redirect('/'),
-    };
-})->name('dashboard');
+    Route::get('/notifications/mark-read', function () {
+        Auth::user()->unreadNotifications->markAsRead();
+        return response()->json(['status' => 'read']);
+    })->name('notifications.markAllRead')->middleware('auth');
 
-Route::get('/notifications/mark-read', function () {
-    Auth::user()->unreadNotifications->markAsRead();
-    return response()->json(['status' => 'read']);
-})->name('notifications.markAllRead')->middleware('auth');
-
-Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
-
-Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
-
-
-Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
-Route::get('/logs/export/{type}', [ActivityLogController::class, 'export'])->name('logs.export');
+    Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
+    Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
+    Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
+    Route::get('/logs/export/{format}', [ActivityLogController::class, 'exportLogs'])->name('logs.export');
+    Route::get('/dashboard/admin', [ActivityLogController::class, 'recent'])->name('dashboard.admin');
+        
+    // Show forgot password form
+ 

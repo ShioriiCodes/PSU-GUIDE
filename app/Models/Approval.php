@@ -13,8 +13,11 @@ class Approval extends Model
         'announcement_id',
         'approved_by',
         'approved_at',
+        'status',
+        'rejection_reason',
+        'rejected_at',
     ];
-    
+
     public $timestamps = false;
 
     public function announcement()

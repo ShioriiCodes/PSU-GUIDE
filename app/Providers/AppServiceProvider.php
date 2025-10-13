@@ -9,6 +9,8 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\SiteAnalytics;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use App\Models\User;
+use App\Models\Announcement;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,8 +29,8 @@ class AppServiceProvider extends ServiceProvider
     {
 
         Relation::morphMap([
-        'user' => \App\Models\User::class,
-        'announcement' => \App\Models\Announcement::class,
+        'user' => User::class,
+        'announcement' => Announcement::class,
         // Add other mappings if needed
     ]);
     }

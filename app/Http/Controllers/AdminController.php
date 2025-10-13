@@ -8,9 +8,7 @@ use App\Models\Announcement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Department;
-use Illuminate\Support\Facades\Hash;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 class AdminController extends Controller
 {
@@ -38,10 +36,18 @@ class AdminController extends Controller
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('profile_pictures', $filename, 'public');
 
-            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
-                Storage::disk('public')->delete($user->profile_picture);
+            // Store directly in public/storage/profile_pictures for Windows compatibility
+            $destinationPath = public_path('storage/profile_pictures');
+            $file->move($destinationPath, $filename);
+            $path = 'profile_pictures/' . $filename;
+
+            // Delete old picture if exists
+            if ($user->profile_picture) {
+                $oldPath = public_path('storage/' . $user->profile_picture);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
             }
 
             $user->profile_picture = $path;
@@ -49,9 +55,10 @@ class AdminController extends Controller
 
         $user->name = $request->input('name');
         $user->email = $request->input('email');
-        $user =Auth::user();
 
-        // ✅ Log the update (ensure ActivityLogger exists and is working)
+        $user->save(); // persist changes
+
+        //  Log the update (ensure ActivityLogger exists and is working)
         if (class_exists(\App\Helpers\ActivityLogger::class)) {
             \App\Helpers\ActivityLogger::log('update_profile (admin)', get_class($user), $user->id);
         }

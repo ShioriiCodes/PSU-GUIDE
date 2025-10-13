@@ -17,7 +17,7 @@ class ActivityLogger
             ActivityLog::create([
                 'user_id'     => $user?->id,
                 'action'      => $action . ' (' . ($user?->role ?? 'Guest') . ')',
-                'target_type' => is_object($target) ? get_class($target) : $target,
+                'target_type' => null,
                 'target_id'   => $targetId,
                 'timestamp'   => now(),
                 'ip_address'  => Request::ip(),

@@ -56,12 +56,12 @@
             <button type="submit" name="format" value="pdf" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">
                 Download PDF
             </button>
-            <button type="submit" name="format" value="excel" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
+            {{-- <button type="submit" name="format" value="excel" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
                 Download Excel
             </button>
             <button type="submit" name="format" value="txt" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
                 Download TXT
-            </button>
+            </button> --}}
         </form>
     </div>
 </div>

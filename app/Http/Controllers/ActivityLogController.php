@@ -5,16 +5,119 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 use App\Models\ActivityLog;
-use App\Exports\ActivityLogsExport;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use App\Models\User; 
+use App\Models\User;
+use App\Models\Announcement;
+use App\Models\Department;
+use App\Models\Category;
+use App\Models\SiteAnalytics;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class ActivityLogController extends Controller
 {
+
+    public function recent()
+    {
+        $categories = Category::all();
+
+        $pendingAnnouncements = Announcement::with('user')
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
+        $students = User::where('role', 'student')
+            ->with('department')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $moderators = User::whereIn('role', ['admin', 'registrar', 'usg'])->get();
+
+        $faculty = User::where('role', 'faculty')
+            ->with('department')
+            ->get();
+
+        $activityLogs = ActivityLog::with('user')->latest()->take(100)->get();
+        $announcements = Announcement::with(['user', 'category'])
+            ->latest()
+            ->get();
+
+        $totalPosts = $announcements->count();
+        $approved = $announcements->where('status', 'approved')->count();
+        $pending = $announcements->where('status', 'pending')->count();
+        $rejected = $announcements->where('status', 'rejected')->count();
+
+        $totalStudents = $students->count();
+        $totalFaculty = $faculty->count();
+        $totalDepartments = Department::count();
+        $guestVisitors = SiteAnalytics::count();
+
+        $today = Carbon::today();
+        $last7Days = now()->subDays(6)->startOfDay();
+
+        $analytics = SiteAnalytics::selectRaw('DATE(created_at) as date, COUNT(*) as visits')
+            ->where('created_at', '>=', $last7Days)
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->keyBy('date');
+
+        $labels = [];
+        $data = [];
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = $last7Days->copy()->addDays($i)->toDateString();
+            $labels[] = $date;
+            $data[] = $analytics[$date]->visits ?? 0;
+        }
+
+        $avgSeconds = SiteAnalytics::whereNotNull('duration')->avg('duration');
+        $avgTime = $avgSeconds
+            ? sprintf('%02d:%02d', floor($avgSeconds / 60), $avgSeconds % 60)
+            : '00:00';
+
+        $dailyVisitors = SiteAnalytics::whereDate('created_at', $today)->count();
+        $totalPageViews = SiteAnalytics::count();
+
+        $availableRoles = User::whereIn('role', ['usg', 'registrar'])
+            ->select('role')
+            ->distinct()
+            ->pluck('role');
+
+        $logs = ActivityLog::with('user', 'target')
+            ->orderByDesc('timestamp')
+            ->get();
+
+        $latestLog = ActivityLog::with('target')->latest()->first();
+
+        return view('dashboard.admin', compact(
+            'pendingAnnouncements',
+            'students',
+            'moderators',
+            'faculty',
+            'categories',
+            'announcements',
+            'activityLogs',
+            'dailyVisitors',
+            'totalPageViews',
+            'avgTime',
+            'labels',
+            'data',
+            'totalStudents',
+            'totalFaculty',
+            'guestVisitors',
+            'totalPosts',
+            'totalDepartments',
+            'availableRoles',
+            'latestLog',
+            'logs',
+            'approved',
+            'pending',
+            'rejected'
+        ));
+    }
 
     public function export($format)
     {
@@ -117,23 +220,67 @@ class ActivityLogController extends Controller
     {
         $logs = ActivityLog::with('user');
 
-        // Filter by role
         if ($request->filled('role')) {
-            $logs->whereHas('user', fn ($q) => $q->where('role', $request->role));
+            $logs->whereHas('user', function ($q) use ($request) {
+                $q->where('role', $request->role);
+            });
         }
 
-        // ✅ Filter by date range
         if ($request->filled('from') && $request->filled('to')) {
             $logs->whereBetween('timestamp', [
                 Carbon::parse($request->from)->startOfDay(),
-                Carbon::parse($request->to)->endOfDay()
+                Carbon::parse($request->to)->endOfDay(),
             ]);
         }
 
-        $logs = $logs->latest()->paginate(20);
+        $logs = $logs->latest()->get(); // or paginate()
 
         return view('logs.index', compact('logs'));
     }
 
+    public function exportLogs($format)
+    {
+        $logs = ActivityLog::with('user')->latest()->get();
+
+        if ($format === 'excel') {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Header row
+            $sheet->fromArray([
+                ['Timestamp', 'User', 'Role', 'Action']
+            ]);
+
+            foreach ($logs as $i => $log) {
+                $sheet->fromArray([
+                    $log->timestamp,
+                    $log->user->name ?? 'Guest',
+                    ucfirst($log->user->role ?? 'Public'),
+                    $log->action,
+                ], null, 'A' . ($i + 2));
+            }
+
+            $file = tempnam(sys_get_temp_dir(), 'activity_logs') . '.xlsx';
+            (new Xlsx($spreadsheet))->save($file);
+
+            return response()->download($file, 'activity_logs.xlsx')->deleteFileAfterSend(true);
+        }
+
+        if ($format === 'txt') {
+            $content = '';
+            foreach ($logs as $log) {
+                $user = $log->user->name ?? 'Guest';
+                $role = ucfirst($log->user->role ?? 'Public');
+                $content .= "{$log->timestamp} - {$user} ({$role}) - {$log->action}\n";
+            }
+
+            return Response::make($content, 200, [
+                'Content-Type' => 'text/plain',
+                'Content-Disposition' => 'attachment; filename="activity_logs.txt"',
+            ]);
+        }
+
+        return back()->with('error', 'Invalid format selected.');
+    }
 
 }

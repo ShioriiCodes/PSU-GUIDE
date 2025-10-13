@@ -6,7 +6,23 @@
     </p>
 
     @if($announcement->poster_image)
-        <img src="{{ asset('storage/' . $announcement->poster_image) }}" alt="Poster" class="w-full max-h-[400px] object-contain rounded mb-4">
+        @php
+            $ext = strtolower(pathinfo($announcement->poster_image, PATHINFO_EXTENSION));
+        @endphp
+        @if(in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']))
+            <img src="{{ asset('storage/' . $announcement->poster_image) }}" alt="Poster" class="w-full max-h-[400px] object-contain rounded mb-4">
+        @elseif($ext === 'pdf')
+            <div class="w-full max-h-[400px] flex items-center justify-center bg-gray-100 rounded mb-4">
+                <a href="{{ asset('storage/' . $announcement->poster_image) }}" target="_blank" class="flex flex-col items-center">
+                    <img src="{{ asset('image/icon/pdf-(1).svg') }}" alt="PDF File" class="w-24 h-24 mb-2">
+                    <span class="text-sm text-gray-600">Click to view PDF</span>
+                </a>
+            </div>
+        @else
+            <div class="w-full max-h-[400px] flex items-center justify-center bg-gray-100 rounded mb-4 text-gray-400 text-sm">
+                Unsupported file type
+            </div>
+        @endif
     @endif
 
     <p class="text-gray-800 mb-6 whitespace-pre-line">{{ $announcement->content }}</p>

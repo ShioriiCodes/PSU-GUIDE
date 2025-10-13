@@ -10,7 +10,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
             $table->string('action', 100);
-            $table->string('target_type', 100);
+            $table->string('target_type', 200);
             $table->unsignedBigInteger('target_id')->index();
             $table->timestamp('timestamp')->useCurrent();
             $table->timestamps();

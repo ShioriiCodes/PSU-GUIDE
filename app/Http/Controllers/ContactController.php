@@ -22,10 +22,9 @@ class ContactController extends Controller
         Mail::to('psuguide.info@gmail.com')->send(new ContactMessage($validated));
 
         // Log the public action (no user_id, so null)
-        ActivityLogger::log('contact_message_sent', 'PublicContact', null);
+        ActivityLogger::log('contact_message_sent', null, null);
 
         return redirect()->back()->with('success', 'Message sent successfully!');
     }
-
-
+    
 }

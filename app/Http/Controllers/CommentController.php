@@ -7,7 +7,7 @@ use App\Models\Comment;
 use App\Models\Announcement;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\CommentRepliedNotification;
+use App\Notifications\CommentReplyNotification;
 
 class CommentController extends Controller
 {
@@ -31,30 +31,73 @@ class CommentController extends Controller
         if ($comment->parent_id) {
             $parent = Comment::find($comment->parent_id);
             if ($parent && $parent->user_id !== Auth::id()) {
-                $parent->user->notify(new CommentRepliedNotification($comment));
+                $parent->user->notify(new CommentReplyNotification($comment));
             }
         }
 
         return back()->with('success', 'Comment added!');
     }
 
-        public function update(Request $request, $id)
-        {
-            $comment = Comment::findOrFail($id);
-
-            if ($comment->user_id !== Auth::id()) {
-                abort(403);
-            }
-
-            $request->validate([
-                'content' => 'required|string|max:2000',
-            ]);
-
-            $comment->update(['content' => $request->content]);
-
-            return back()->with('success', 'Comment updated.');
+    public function edit(Comment $comment)
+    {
+        if ($comment->user_id !== Auth::id()) {
+            abort(403);
         }
 
+        return response()->json(['content' => $comment->content]);
+    }
+
+    public function update(Request $request, Comment $comment)
+    {
+        if ($comment->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'content' => 'required|string|max:2000',
+        ]);
+
+        $comment->update([
+            'content' => $request->content,
+            'edited_at' => now(),
+        ]);
+
+        return back()->with('success', 'Comment updated.');
+    }
+
+    public function like(Comment $comment)
+    {
+        $user = Auth::user();
+
+        if ($comment->isLikedBy($user)) {
+            $comment->likes()->detach($user->id);
+        } else {
+            $comment->likes()->attach($user->id);
+        }
+
+        return back();
+    }
+
+    public function reply(Request $request, Comment $comment)
+    {
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        $reply = Comment::create([
+            'user_id' => Auth::id(),
+            'announcement_id' => $comment->announcement_id,
+            'parent_id' => $comment->id,
+            'content' => $request->content,
+        ]);
+
+        // Notify the parent comment author
+        if ($comment->user_id !== Auth::id()) {
+            $comment->user->notify(new CommentReplyNotification($reply));
+        }
+
+        return back()->with('success', 'Reply added!');
+    }
 
     public function destroy($id)
     {
@@ -67,12 +110,11 @@ class CommentController extends Controller
 
         ActivityLog::create([
             'user_id' => Auth::id(),
-            'action' => 'updated_comment',
-            'target_type' => 'App\Models\Comment',
+            'action' => 'deleted_comment',
+            'target_type' => 'comment',
             'target_id' => $comment->id,
             'timestamp' => now(),
         ]);
-
 
         return back()->with('success', 'Comment deleted.');
     }

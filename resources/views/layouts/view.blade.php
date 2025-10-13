@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/alpinejs" defer></script>
     <link rel="icon" href="{{ asset('logo/logo.ico') }}" type="image/x-icon">
 </head>
-<body class=" text-white  bg-white">
+<body class=" bg-white">
 <!-- Optional Header -->
 <header class="bg-white shadow-md py-6 px-6 flex justify-center items-center">
     <div class="flex items-center w-full max-w-3xl mx-auto">
@@ -24,8 +24,7 @@
 </header>
 
     <!-- Main Content -->
-    <main class="flex-1 px-6 py-8 bg-[#F4E7E1] min-h-screen">
-
+    <main class="flex-1 px-6 pt-10 pb-20 bg-[#F4E7E1] min-h-screen">
         @yield('content')
     </main>
 

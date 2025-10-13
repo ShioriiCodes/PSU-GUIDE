@@ -1,101 +1,99 @@
 
 @extends('layouts.custom')
 
-@section('title', 'Home')
+@section('title', 'About')
 
 @section('content')
 
-  <!-- ABOUT PAGE -->
-  <section class="bg-[#F4E7E1] text-black px-4 sm:px-6 py-20">
-    <!-- Page Header -->
-    
-    <div class="max-w-[1400px] mx-auto text-center mb-12">
-      <h1 class="text-3xl sm:text-4xl font-bold mb-4">What is PSU-GUIDE?</h1>
-      <p class="text-base sm:text-lg">
-        Your all-in-one information portal for PSU Quezon Campus — made by students, for students and faculties.
+<!-- ABOUT PAGE -->
+<section class="bg-white pt-10 pb-5 px-4 font-[Poppins]">
+  <div class="max-w-[1200px] mx-auto">
+
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-3xl sm:text-4xl font-bold text-black mb-4">About PSU-Guide</h1>
+      <p class="text-gray-700 text-base max-w-2xl mx-auto">
+        Empowering the PSU Quezon community with seamless access to official information and announcements.
       </p>
     </div>
 
-    <!-- Introduction Section -->
-    <div class="max-w-3xl mx-auto mb-16 text-sm sm:text-base leading-relaxed">
-      <p class="mb-4">
-        <strong>PSU-GUIDE</strong> is a student-led capstone project developed to solve the growing problem of scattered,
-        outdated, or unreliable announcements within Palawan State University Quezon Campus. With many students relying on
-        various Facebook pages for updates, PSU-GUIDE creates a centralized and verified platform that combines all
-        important information in one website.
-      </p>
-      <p class="mb-4">
-        From enrollment schedules to campus events, student elections to class suspensions — everything you need to know
-        is posted here after official verification. No more guesswork or misinformation.
-      </p>
-      <ul class="list-disc list-inside text-black">
-        <li>Official updates directly from PSU departments like Registrar and USG</li>
-        <li>Access through your PSU student number — no need to register</li>
-        <li>Guest users can still view general announcements</li>
-        <li>Ensures clarity, accuracy, and faster student communication</li>
-      </ul>
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <div class="bg-white p-6 rounded-lg shadow text-center">
+        <h3 class="text-lg font-semibold text-black mb-2">Timely Announcements</h3>
+        <p class="text-gray-600 text-sm">Stay updated with the latest campus news and events.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow text-center">
+        <h3 class="text-lg font-semibold text-black mb-2">Official Information</h3>
+        <p class="text-gray-600 text-sm">Access verified and approved content from university staff.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow text-center">
+        <h3 class="text-lg font-semibold text-black mb-2">Community Driven</h3>
+        <p class="text-gray-600 text-sm">Built by students for the benefit of the entire campus.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow text-center">
+        <h3 class="text-lg font-semibold text-black mb-2">Easy Access</h3>
+        <p class="text-gray-600 text-sm">Simple and intuitive interface for all users.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow text-center">
+        <h3 class="text-lg font-semibold text-black mb-2">User-Friendly</h3>
+        <p class="text-gray-600 text-sm">Designed with simplicity in mind for effortless navigation.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow text-center">
+        <h3 class="text-lg font-semibold text-black mb-2">Secure</h3>
+        <p class="text-gray-600 text-sm">Your data is protected with robust security measures.</p>
+      </div>
     </div>
-      <!-- Mission and Vision Section -->
-    <div class="max-w-5xl mx-auto mb-16 grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Mission -->
-      <div class="bg-white shadow-md rounded-lg p-8 border-l-4 border-[#f15b24ec]">
-        <h2 class="text-xl font-bold text-[#521C0D] mb-4">Our Mission</h2>
-        <p class="text-sm sm:text-base leading-relaxed text-gray-700">
-          To provide a centralized, reliable, and user-friendly platform that delivers timely and verified announcements for
-          the Palawan State University Quezon Campus community — ensuring transparency, accessibility, and improved student engagement.
+
+    <!-- Mission and Vision -->
+    <div class="grid md:grid-cols-2 gap-12 mb-16">
+      <div class="bg-white p-8 rounded-lg shadow">
+        <h2 class="text-2xl font-bold text-black mb-4">Our Mission</h2>
+        <p class="text-gray-700 leading-relaxed">
+          To bridge the gap between university administration and students by providing a reliable platform for sharing important information, fostering transparency, and enhancing campus engagement.
         </p>
       </div>
 
-      <!-- Vision -->
-      <div class="bg-white shadow-md rounded-lg p-6 border-l-4 border-[#FF9B45]">
-        <h2 class="text-xl font-bold text-[#521C0D] mb-4">Our Vision</h2>
-        <p class="text-sm sm:text-base leading-relaxed text-gray-700">
-          To become the university’s trusted digital bulletin — fostering informed decision-making, streamlined communication,
-          and a connected academic environment through modern web technologies.
+      <div class="bg-white p-8 rounded-lg shadow">
+        <h2 class="text-2xl font-bold text-black mb-4">Our Vision</h2>
+        <p class="text-gray-700 leading-relaxed">
+          To become the go-to source for all PSU Quezon-related information, ensuring every student and staff member stays informed and connected.
         </p>
       </div>
     </div>
 
-    <!-- Feature Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1400px] mx-auto mb-16">
-      
-      <!-- Verified Updates -->
-      <div class="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition text-center">
-        <img src="{{asset('image/icon/verified.png')}}" alt="Verified Icon" class="mx-auto mb-3 h-12 w-12">
-        <h3 class="font-bold text-lg mb-2">Verified Updates</h3>
-        <p class="text-sm">All posts are reviewed by PSU staff before publishing — no fake news, no confusion.</p>
-      </div>
-
-      <!-- Centralized Info -->
-      <div class="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition text-center">
-        <img src="{{asset('image/icon/web.png')}}" alt="Centralized Icon" class="mx-auto mb-3 h-12 w-12">
-        <h3 class="font-bold text-lg mb-2">Centralized Access</h3>
-        <p class="text-sm">Enrollment, USG, academics, memos — all accessible from one unified platform.</p>
-      </div>
-
-      <!-- Student Login -->
-      <div class="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition text-center">
-        <img src="{{asset('image/icon/login.png')}}" alt="Student Login Icon" class="mx-auto mb-3 h-12 w-12">
-        <h3 class="font-bold text-lg mb-2">Student Access</h3>
-        <p class="text-sm">Login is seamless with your PSU student number. No sign-ups required.</p>
-      </div>
-
-      <!-- Guest Access -->
-      <div class="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition text-center">
-        <img src="{{asset('image/icon/guest.png')}}" alt="Guest Icon" class="mx-auto mb-3 h-12 w-12">
-        <h3 class="font-bold text-lg mb-2">Guest-Friendly</h3>
-        <p class="text-sm">Non-PSU users can still access public updates such as events or notices.</p>
-      </div>
+    <!-- CTA Section -->
+    <div class="text-center bg-white p-8 rounded-lg shadow">
+      <h2 class="text-2xl font-bold text-black mb-4">Ready to Stay Informed?</h2>
+      <p class="text-gray-700 mb-6">
+        Join thousands of students who rely on PSU-Guide for accurate and timely updates.
+      </p>
+      <a href="{{ route('contact') }}" class="bg-[#D5451B] text-white px-6 py-2 rounded-md hover:bg-[#FF9B45] transition">
+        Get in Touch
+      </a>
     </div>
 
     <!-- CTA Footer -->
-    <div class="container mx-auto px-4 sm:px-6 text-center max-w-[1400px]">
-      <h2 class="text-2xl sm:text-3xl font-bold mb-4">Why PSU-GUIDE Matters</h2>
-      <p class="text-sm sm:text-base max-w-2xl mx-auto mb-6">
-        This platform is more than just a website — it's a solution. PSU-GUIDE bridges communication gaps, promotes transparency, and helps students stay informed and connected with what’s happening in our campus.
+    <div class="container pt-10 mx-auto px-4 sm:px-6 text-center max-w-[1400px]">
+      <h2 class="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
+        <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Why PSU-GUIDE Matters
+      </h2>
+      <p class="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto mb-6">
+        This platform is more than just a website — it's a solution. PSU-GUIDE bridges communication gaps, promotes transparency, and helps students stay informed and connected with what's happening in our campus.
       </p>
       <a href="{{ route('contact') }}"
-        class="inline-block bg-[#D5451B] text-white px-6 py-3 rounded-md hover:bg-[#FF9B45] transition">
+        class="inline-flex items-center gap-2 bg-slate-600 text-white px-6 py-3 rounded-lg hover:bg-slate-700 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
         Learn More About This Project
       </a>
     </div>

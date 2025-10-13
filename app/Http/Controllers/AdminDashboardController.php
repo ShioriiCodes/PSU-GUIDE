@@ -15,100 +15,6 @@ use Carbon\Carbon;
 
 class AdminDashboardController extends Controller
 {
-    public function index()
-    {
-        $categories = Category::all();
-
-        $pendingAnnouncements = Announcement::with('user')
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
-
-        $students = User::where('role', 'student')
-            ->with('department')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $moderators = User::whereIn('role', ['admin', 'registrar', 'usg'])->get();
-
-        $faculty = User::where('role', 'faculty')
-            ->with('department')
-            ->get();
-
-        $announcements = Announcement::with(['user', 'category'])
-            ->latest()
-            ->get();
-
-        $activityLogs = ActivityLog::with('user')->latest()->take(100)->get();
-        $announcements = \App\Models\Announcement::latest()->get();
-        
-        $totalStudents = $students->count();
-        $totalFaculty = $faculty->count();
-        $totalDepartments = Department::count();
-        $totalPosts = $announcements->count();
-        $guestVisitors = SiteAnalytics::count();
-
-        $today = Carbon::today();
-        $last7Days = now()->subDays(6)->startOfDay();
-
-        $analytics = SiteAnalytics::selectRaw('DATE(created_at) as date, COUNT(*) as visits')
-            ->where('created_at', '>=', $last7Days)
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->keyBy('date');
-
-        $labels = [];
-        $data = [];
-
-        for ($i = 0; $i < 7; $i++) {
-            $date = $last7Days->copy()->addDays($i)->toDateString();
-            $labels[] = $date;
-            $data[] = $analytics[$date]->visits ?? 0;
-        }
-
-        $avgSeconds = SiteAnalytics::whereNotNull('duration')->avg('duration');
-        $avgTime = $avgSeconds
-            ? sprintf('%02d:%02d', floor($avgSeconds / 60), $avgSeconds % 60)
-            : '00:00';
-
-        $dailyVisitors = SiteAnalytics::whereDate('created_at', $today)->count();
-        $totalPageViews = SiteAnalytics::count();
-
-        $availableRoles = User::whereIn('role', ['usg', 'registrar'])
-            ->select('role')
-            ->distinct()
-            ->pluck('role');
-
-        $logs = ActivityLog::with('user', 'target')
-            ->orderByDesc('timestamp')
-            ->get();
-
-        $latestLog = ActivityLog::with('target')->latest()->first();
-
-        return view('dashboard.admin', compact(
-            'pendingAnnouncements',
-            'students',
-            'moderators',
-            'faculty',
-            'categories',
-            'announcements',
-            'activityLogs',
-            'dailyVisitors',
-            'totalPageViews',
-            'avgTime',
-            'labels',
-            'data',
-            'totalStudents',
-            'totalFaculty',
-            'guestVisitors',
-            'totalPosts',
-            'totalDepartments',
-            'availableRoles',
-            'latestLog',
-            'logs'
-        ));
-    }
 
     public function store(Request $request)
     {
@@ -148,4 +54,5 @@ class AdminDashboardController extends Controller
 
         return redirect()->route('dashboard.admin')->with('success', 'Moderator added successfully!');
     }
+
 }
