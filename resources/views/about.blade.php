@@ -6,7 +6,7 @@
 @section('content')
 
 <!-- ABOUT PAGE -->
-<section class="bg-white pt-10 pb-5 px-4 font-[Poppins]">
+<section class="bg-white pt-10 px-4 font-[Poppins]">
   <div class="max-w-[1200px] mx-auto">
 
     <!-- Header -->
@@ -53,18 +53,43 @@
     <!-- Mission and Vision -->
     <div class="grid md:grid-cols-2 gap-12 mb-16">
       <div class="bg-white p-8 rounded-lg shadow">
-        <h2 class="text-2xl font-bold text-black mb-4">Our Mission</h2>
+        <h2 class="text-2xl font-bold text-black mb-4">Mission</h2>
         <p class="text-gray-700 leading-relaxed">
-          To bridge the gap between university administration and students by providing a reliable platform for sharing important information, fostering transparency, and enhancing campus engagement.
+            Palawan State University is committed to upgrade people’s quality of life by providing education
+            opportunities through excellent instruction, research and innovation, extension, production
+            services, and transnational collaborations.
         </p>
       </div>
 
       <div class="bg-white p-8 rounded-lg shadow">
-        <h2 class="text-2xl font-bold text-black mb-4">Our Vision</h2>
+        <h2 class="text-2xl font-bold text-black mb-4">Vision</h2>
         <p class="text-gray-700 leading-relaxed">
-          To become the go-to source for all PSU Quezon-related information, ensuring every student and staff member stays informed and connected.
+            An internationally recognized university that provides relevant and innovative education
+            and research for lifelong learning and sustainable development.
         </p>
       </div>
+    </div>
+
+    <!-- Campus Image Section -->
+    <div class="mb-16">
+      <div class="bg-white p-8 rounded-lg shadow">
+        <h2 class="text-2xl font-bold text-black mb-4 text-center">Palawan State University Quezon Campus</h2>
+        <div class="flex justify-center">
+          <img
+            src="{{ asset('image/PROPOSED_SITE DEVELOPMENT_PLAN_page-0001.jpg') }}"
+            alt="Palawan State University Quezon Campus"
+            class="w-full max-w-full h-auto rounded-lg shadow-md cursor-pointer hover:opacity-90 transition-opacity"
+            style="max-width: 1950px; height: auto;"
+            onclick="openImageModal(this.src)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden items-center justify-center p-4" onclick="closeImageModal()">
+      <button onclick="closeImageModal()" class="absolute top-4 right-6 text-white text-3xl leading-none hover:text-gray-300 transition" aria-label="Close">&times;</button>
+      <img id="modalImage" src="" alt="Palawan State University Quezon Campus" class="max-w-[90vw] max-h-[90vh] object-contain rounded shadow-lg" onclick="event.stopPropagation()">
     </div>
 
     <!-- CTA Section -->
@@ -79,7 +104,7 @@
     </div>
 
     <!-- CTA Footer -->
-    <div class="container pt-10 mx-auto px-4 sm:px-6 text-center max-w-[1400px]">
+    {{-- <div class="container pt-10 mx-auto px-4 sm:px-6 text-center max-w-[1400px]">
       <h2 class="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
         <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -96,7 +121,32 @@
         </svg>
         Learn More About This Project
       </a>
-    </div>
+    </div> --}}
   </section>
-  
+
+  <script>
+    function openImageModal(imageSrc) {
+      const modal = document.getElementById('imageModal');
+      const modalImage = document.getElementById('modalImage');
+      modalImage.src = imageSrc;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeImageModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = ''; // Restore scrolling
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeImageModal();
+      }
+    });
+  </script>
+
 @endsection

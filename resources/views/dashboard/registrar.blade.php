@@ -23,9 +23,9 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 font-sans min-h-screen overflow-hidden">
 
-  <div class="min-h-screen flex flex-col md:flex-row relative">
+  <div class="h-screen flex flex-col md:flex-row relative">
     <!-- Mobile Sidebar Toggle -->
     <button id="toggleSidebar" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-custom">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -34,7 +34,7 @@
     </button>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-full md:w-72 bg-white shadow-xl p-6 space-y-6 z-10 fixed md:static top-0 left-0 h-full md:h-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+    <aside id="sidebar" class="w-full md:w-72 bg-white shadow-xl p-6 space-y-6 z-10 fixed md:static top-0 left-0 h-full md:h-screen overflow-y-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
       <div class="flex items-center gap-4 mb-8">
         <a href="/" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 hover:bg-slate-300 transition" title="Back to Home">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,12 +82,12 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 sm:p-6 md:p-8 z-10">
+    <main class="flex-1 p-4 sm:p-6 md:p-8 z-10 h-screen overflow-y-auto">
 
        <!-- Stats Panel -->
     <section id="stats" class="panel rounded-md">
       <h1 class="text-3xl font-bold mb-8 text-slate-800">Announcement Statistics</h1>
-      
+
       <div class="bg-white border border-slate-200 rounded-xl overflow-hidden max-w-lg ml-0 shadow-custom">
         <table class="w-full">
           <thead class="bg-slate-100">
@@ -136,10 +136,17 @@
 
                     <h2 class="text-xl font-semibold mb-4">Update Profile</h2>
 
+                    @php
+                        $registrarProfile = Auth::user()->profile_picture ?? null;
+                        $registrarProfilePath = $registrarProfile ? 'profile_pictures/' . basename($registrarProfile) : null;
+                        $registrarProfileUrl = $registrarProfilePath
+                            ? asset('storage/' . $registrarProfilePath)
+                            : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name);
+                    @endphp
                     <!-- Profile Picture -->
                     <div class="flex items-center gap-6">
                         <img id="profile-preview"
-                            src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                            src="{{ $registrarProfileUrl }}"
                             class="rounded-full w-24 h-24 object-cover border-2 border-gray-300 shadow" />
                         <input type="file" name="profile_picture" accept="image/*" onchange="previewProfileImage(this)" class="text-sm">
                     </div>
@@ -176,7 +183,7 @@
             </div>
 
             {{-- <!-- Password Change -->
-            <div class="bg-white p-6 rounded shadow border">
+            <d iv class="bg-white p-6 rounded shadow border">
                 <form method="POST" action="{{ route('admin.updatePassword') }}" class="space-y-6">
                     @csrf
                     @method('PUT')
@@ -241,14 +248,21 @@
 
           <div id="registrar_customCategoryDiv" class="hidden">
             <label class="block text-sm font-medium mb-1">Custom Category</label>
-            <input name="custom_category" type="text" id="registrar_custom_category" class="w-full p-2 border border-gray-800 rounded" placeholder="Enter custom category name">
+            <input name="custom_category" type="text" id="registrar_custom_category" class="w-full p-2 border border-gray-800 rounded" placeholder="Enter custom category name" required>
           </div>
 
-            {{-- ✅ Poster Image or PDF Upload --}}
+            {{-- ✅ Poster Image or PDF Upload (optional) --}}
             <div>
-              <label class="block text-sm font-medium mb-1">Poster Image or PDF</label>
+              <label class="block text-sm font-medium mb-1">Poster Image or PDF (optional)</label>
               <input name="poster_image" type="file" accept="image/*,.pdf" class="w-full p-2 border border-gray-800 rounded">
               <p class="text-xs text-gray-500 mt-1">Accepted formats: Images (JPG, PNG, etc.) and PDF files.</p>
+            </div>
+
+            {{-- ✅ Multiple Images (new) --}}
+            <div>
+              <label class="block text-sm font-medium mb-1">Additional Images (you can select multiple)</label>
+              <input name="poster_images[]" type="file" multiple accept="image/*" class="w-full p-2 border border-gray-800 rounded">
+              <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple images. Up to 10 images.</p>
             </div>
 
             <button type="submit" class="px-6 py-2 bg-[#D5451B] text-white rounded hover:bg-[#aa3715]">Submit for Approval</button>
@@ -286,8 +300,8 @@
 
       {{-- Search Bar --}}
       <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <input type="text" id="registrarSearch" onkeyup="filterRegistrarAnnouncements()" 
-              placeholder="Search announcements..." 
+        <input type="text" id="registrarSearch" onkeyup="filterRegistrarAnnouncements()"
+              placeholder="Search announcements..."
               class="w-full sm:w-1/2 p-2 border border-gray-300 rounded" />
       </div>
 
@@ -325,7 +339,7 @@
                     @php
                       $approval = $a->approvals()->where('status', 'rejected')->first();
                     @endphp
-                    <button onclick="showRejectionReasonModal('{{ $approval->rejection_reason ?? 'No reason provided' }}')"
+                    <button onclick="showRejectionReasonModal({{ json_encode($approval->rejection_reason ?? 'No reason provided') }})"
                            class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200 transition">
                       View Reason
                     </button>
@@ -349,8 +363,8 @@
           <div class="border border-gray-200 rounded-lg p-4 shadow-sm bg-white">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-semibold uppercase text-gray-500">Status</span>
-              <span class="text-xs px-2 py-1 rounded 
-                {{ $a->status === 'approved' ? 'bg-green-100 text-green-700' : 
+              <span class="text-xs px-2 py-1 rounded
+                {{ $a->status === 'approved' ? 'bg-green-100 text-green-700' :
                   ($a->status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
                 {{ ucfirst($a->status) }}
               </span>
@@ -364,7 +378,7 @@
                 @php
                   $approval = $a->approvals()->where('status', 'rejected')->first();
                 @endphp
-                <button onclick="showRejectionReasonModal('{{ $approval->rejection_reason ?? 'No reason provided' }}')"
+                <button onclick="showRejectionReasonModal({{ json_encode($approval->rejection_reason ?? 'No reason provided') }})"
                        class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200 transition">
                   View Reason
                 </button>
@@ -382,15 +396,15 @@
       <!-- Rejection Reason Modal -->
       <div id="rejectionReasonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[80] px-4">
         <div class="bg-white p-8 rounded-2xl w-full max-w-2xl shadow-2xl relative">
-          <button onclick="closeRejectionReasonModal()"
+          {{-- <button onclick="closeRejectionReasonModal()"
                   class="absolute top-4 right-6 text-gray-400 hover:text-black text-3xl font-bold transition z-[90]">
             &times;
-          </button>
+          </button> --}}
 
           <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Rejection Reason</h2>
 
           <div class="mb-6">
-            <p id="rejectionReasonContent" class="text-gray-700 leading-relaxed"></p>
+            <p id="rejectionReasonContent" class="text-gray-700 leading-relaxed whitespace-pre-line"></p>
           </div>
 
           <div class="flex justify-end">
@@ -424,7 +438,7 @@
         </div>
       </div>
 
-   
+
 
   </main>
 </div>
@@ -487,9 +501,9 @@
         document.getElementById('notificationModal').classList.remove('flex');
     }
 
-    function confirmSubmission() {
-        return confirm('Are you sure you want to submit this announcement for approval?');
-    }
+    // function confirmSubmission() {
+    //     return confirm('Are you sure you want to submit this announcement for approval?');
+    // }
 
     // Check for session messages on page load
     document.addEventListener('DOMContentLoaded', function() {

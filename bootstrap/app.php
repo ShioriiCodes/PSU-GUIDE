@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Append page view logging to the existing 'web' stack (preserves $errors sharing)
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\LogPageView::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

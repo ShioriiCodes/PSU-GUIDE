@@ -15,12 +15,12 @@
     <div class="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-white/20">
       <form method="POST" action="{{ route('password.store') }}" class="space-y-6">
         @csrf
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+        <input type="hidden" name="token" value="{{ $token }}">
 
         <!-- Email Address -->
         <div class="mb-6">
           <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-          <input id="email" name="email" type="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="username"
+          <input id="email" name="email" type="email" value="{{ old('email', request('email')) }}" required autofocus autocomplete="username"
                  class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#D5451B] focus:border-transparent transition"
                  @error('email') is-invalid @enderror>
           @error('email')

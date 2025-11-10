@@ -1,30 +1,40 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Mail\ContactMessage;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Http\Request;
+
 use App\Helpers\ActivityLogger;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
-
     public function send(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'message' => 'required|string',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'message' => ['required', 'string', 'max:5000'],
         ]);
 
-        // Send the email
-        Mail::to('psuguide.info@gmail.com')->send(new ContactMessage($validated));
+        $to = config('mail.from.address') ?: env('MAIL_TO_ADDRESS', null);
 
-        // Log the public action (no user_id, so null)
-        ActivityLogger::log('contact_message_sent', null, null);
+        try {
+            if ($to) {
+                Mail::raw(
+                    "From: {$validated['name']} <{$validated['email']}>\n\n{$validated['message']}",
+                    function ($m) use ($to) {
+                        $m->to($to)->subject('New Contact Message - PSU-GUIDE');
+                    }
+                );
+            }
+        } catch (\Throwable $e) {
+            // Ignore mail transport errors for now to not block UX
+        }
 
-        return redirect()->back()->with('success', 'Message sent successfully!');
+        ActivityLogger::log('contact_message', null, null);
+
+        return back()->with('success', 'Thanks! Your message has been sent.');
     }
-    
 }
+
+

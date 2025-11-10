@@ -4,11 +4,11 @@
             {{ __('Profile') }}
         </h2>
     </x-slot>
-    
+
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-    
+
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                     @csrf
@@ -18,7 +18,10 @@
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
                         @if (Auth::user()->profile_picture)
-                            <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" class="w-20 h-20 rounded-full my-2">
+                            @php
+                                $profileFilename = basename(Auth::user()->profile_picture);
+                            @endphp
+                            <img src="{{ asset('storage/profile_pictures/' . $profileFilename) }}" class="w-20 h-20 rounded-full my-2">
                         @endif
                         <input type="file" name="profile_picture" class="mt-1 block w-full">
                         @error('profile_picture')

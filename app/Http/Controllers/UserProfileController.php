@@ -2,46 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Role;
 use App\Models\Department;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserProfileController extends Controller
 {
-    
-    public function edit($id)
+    public function edit(int $id)
     {
         $student = User::findOrFail($id);
 
-        // Roles are stored as plain strings in users table
         $roles = ['Student', 'Faculty'];
-
-        // Departments come from departments table
         $departments = Department::all();
 
-        return view('account.edit', compact('student', 'roles', 'departments'));
+        if (view()->exists('account.edit')) {
+            return view('account.edit', compact('student', 'roles', 'departments'));
+        }
+
+        return redirect()->back()->with('status', 'Edit view not available.');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $request->validate([
-            'role'        => 'required|string|max:255',
+            'role' => 'required|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
-            'password'    => 'nullable|min:6|confirmed', // needs password_confirmation in form
+            'password' => 'nullable|min:6|confirmed',
         ]);
 
         $user = User::findOrFail($id);
 
-        // Role comes directly from string
         $user->role = $request->role;
-
-        // Department is an ID
         $user->department_id = $request->department_id;
 
-        // Update password only if provided
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
@@ -50,6 +44,8 @@ class UserProfileController extends Controller
 
         return redirect()->back()->with('success', 'User updated successfully!');
     }
-
-    
 }
+
+
+
+

@@ -5,13 +5,13 @@
 @section('content')
 
 <!-- Forgot Password Section -->
-<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8">
+<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8 pt-[-100px]">
+  <div class="max-w-md w-full space-y-8 pt-[-100px]">
     <div class="text-center">
       <h2 class="text-3xl font-bold text-gray-900 mb-2">Forgot Your Password?</h2>
-      <p class="text-gray-600">Enter your email below to reset your password.</p>
+      <p class="text-gray-600">Enter your campus email below. We will forward the request to an administrator for approval.</p>
       <p class="text-sm text-gray-500 mt-2">
-        Admins will receive a reset link. Other users will send a request to the admin.
+        Once approved, Laravel automatically emails the official password reset link to your Gmail inbox.
       </p>
     </div>
 
@@ -39,7 +39,7 @@
         <div class="flex justify-center">
           <button type="submit"
                   class="w-full bg-gradient-to-r from-[#D5451B] to-[#FF9B45] text-white py-3 rounded-lg font-semibold hover:from-[#FF9B45] hover:to-[#D5451B] transition duration-300 transform hover:scale-105">
-            Send Forgot Password Request
+            Submit Reset Request for Approval
           </button>
         </div>
       </form>

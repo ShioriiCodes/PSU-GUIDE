@@ -1,8 +1,39 @@
   // Sidebar Toggle
   const sidebar = document.getElementById('sidebar');
   const toggleSidebarBtn = document.getElementById('toggleSidebar');
-  toggleSidebarBtn?.addEventListener('click', () => {
-    sidebar?.classList.toggle('-translate-x-full');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+  function toggleSidebar() {
+    if (sidebar) {
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+      if (isHidden) {
+        sidebar.classList.remove('-translate-x-full');
+        if (sidebarBackdrop) sidebarBackdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
+      }
+    }
+  }
+
+  toggleSidebarBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSidebar();
+  });
+
+  // Close sidebar when clicking on backdrop
+  sidebarBackdrop?.addEventListener('click', () => {
+    toggleSidebar();
+  });
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth < 768 && sidebar && !sidebar.contains(e.target) && !toggleSidebarBtn?.contains(e.target)) {
+      if (!sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.add('-translate-x-full');
+        if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
+      }
+    }
   });
 
   // Show Panel Logic
@@ -15,7 +46,7 @@
     const clicked = document.querySelector(`#btn-${id}`);
     if (clicked) clicked.classList.add('bg-[#E17C5F]', 'text-white');
 
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < 1024) {
       sidebar?.classList.add('-translate-x-full');
     }
 
@@ -28,14 +59,14 @@
     showPanel(hash);
 
     const form = document.getElementById('announcementForm');
-    if (form) {
-      form.addEventListener('submit', function (e) {
-        const confirmed = confirm('Are you sure you want to submit this announcement for approval?');
-        if (!confirmed) {
-          e.preventDefault();
-        }
-      });
-    }
+    // if (form) {
+    //   form.addEventListener('submit', function (e) {
+    //     const confirmed = confirm('Are you sure you want to submit this announcement for approval?');
+    //     if (!confirmed) {
+    //       e.preventDefault();
+    //     }
+    //   });
+    // }
   });
 
   // Filter Registrar Announcements

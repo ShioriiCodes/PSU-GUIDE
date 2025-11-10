@@ -111,8 +111,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'psuguide.info@gmail.com'),
+        'name' => env('MAIL_FROM_NAME', 'PSU-Guide'),
     ],
     
     'admin_address' => env('ADMIN_EMAIL', 'psuguide.info@gmail.com'),

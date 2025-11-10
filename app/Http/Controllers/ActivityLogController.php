@@ -1,286 +1,123 @@
 <?php
 
 namespace App\Http\Controllers;
-use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
-use PhpOffice\PhpWord\PhpWord;
+
 use App\Models\ActivityLog;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use App\Models\User;
-use App\Models\Announcement;
-use App\Models\Department;
-use App\Models\Category;
-use App\Models\SiteAnalytics;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ActivityLogController extends Controller
 {
-
-    public function recent()
+    /**
+     * Show logs page.
+     */
+    public function index()
     {
-        $categories = Category::all();
+        $logs = ActivityLog::with('user')
+            ->orderByDesc('timestamp')
+            ->paginate(100);
 
-        $pendingAnnouncements = Announcement::with('user')
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
-
-        $students = User::where('role', 'student')
-            ->with('department')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $moderators = User::whereIn('role', ['admin', 'registrar', 'usg'])->get();
-
-        $faculty = User::where('role', 'faculty')
-            ->with('department')
-            ->get();
-
-        $activityLogs = ActivityLog::with('user')->latest()->take(100)->get();
-        $announcements = Announcement::with(['user', 'category'])
-            ->latest()
-            ->get();
-
-        $totalPosts = $announcements->count();
-        $approved = $announcements->where('status', 'approved')->count();
-        $pending = $announcements->where('status', 'pending')->count();
-        $rejected = $announcements->where('status', 'rejected')->count();
-
-        $totalStudents = $students->count();
-        $totalFaculty = $faculty->count();
-        $totalDepartments = Department::count();
-        $guestVisitors = SiteAnalytics::count();
-
-        $today = Carbon::today();
-        $last7Days = now()->subDays(6)->startOfDay();
-
-        $analytics = SiteAnalytics::selectRaw('DATE(created_at) as date, COUNT(*) as visits')
-            ->where('created_at', '>=', $last7Days)
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->keyBy('date');
-
-        $labels = [];
-        $data = [];
-
-        for ($i = 0; $i < 7; $i++) {
-            $date = $last7Days->copy()->addDays($i)->toDateString();
-            $labels[] = $date;
-            $data[] = $analytics[$date]->visits ?? 0;
+        if (view()->exists('logs.index')) {
+            return view('logs.index', compact('logs'));
         }
 
-        $avgSeconds = SiteAnalytics::whereNotNull('duration')->avg('duration');
-        $avgTime = $avgSeconds
-            ? sprintf('%02d:%02d', floor($avgSeconds / 60), $avgSeconds % 60)
-            : '00:00';
-
-        $dailyVisitors = SiteAnalytics::whereDate('created_at', $today)->count();
-        $totalPageViews = SiteAnalytics::count();
-
-        $availableRoles = User::whereIn('role', ['usg', 'registrar'])
-            ->select('role')
-            ->distinct()
-            ->pluck('role');
-
-        $logs = ActivityLog::with('user', 'target')
-            ->orderByDesc('timestamp')
-            ->get();
-
-        $latestLog = ActivityLog::with('target')->latest()->first();
-
-        return view('dashboard.admin', compact(
-            'pendingAnnouncements',
-            'students',
-            'moderators',
-            'faculty',
-            'categories',
-            'announcements',
-            'activityLogs',
-            'dailyVisitors',
-            'totalPageViews',
-            'avgTime',
-            'labels',
-            'data',
-            'totalStudents',
-            'totalFaculty',
-            'guestVisitors',
-            'totalPosts',
-            'totalDepartments',
-            'availableRoles',
-            'latestLog',
-            'logs',
-            'approved',
-            'pending',
-            'rejected'
-        ));
+        return response()->json($logs);
     }
 
-    public function export($format)
+    /**
+     * Export logs in CSV (default) or JSON.
+     */
+    public function export(string $format = 'csv')
     {
-        $logs = ActivityLog::with('user')->latest()->get();
+        $collection = ActivityLog::orderByDesc('timestamp')->get([
+            'user_id', 'action', 'target_type', 'target_id', 'timestamp',
+        ]);
 
         if ($format === 'pdf') {
-            return Pdf::loadView('exports.activity_logs_pdf', compact('logs'))
-                ->download('activity_logs.pdf');
+            // Render a simple HTML table and convert to PDF
+            $html = view()->exists('logs.pdf')
+                ? view('logs.pdf', ['logs' => $collection])->render()
+                : $this->buildPdfHtml($collection);
+
+            return Pdf::loadHTML($html)->download('activity_logs.pdf');
         }
 
-        if ($format === 'excel') {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-            $sheet->fromArray([
-                ['Timestamp', 'User', 'Role', 'Action']
-            ]);
+        if ($format === 'json') {
+            return response()->json($collection);
+        }
 
-            foreach ($logs as $i => $log) {
-                $sheet->fromArray([
-                    $log->timestamp,
-                    $log->user->name ?? 'Guest',
-                    ucfirst($log->user->role ?? 'Public'),
+        // CSV
+        $headers = ['Content-Type' => 'text/csv'];
+        $filename = 'activity_logs.csv';
+
+        $callback = function () use ($collection) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['user_id', 'action', 'target_type', 'target_id', 'timestamp']);
+            foreach ($collection as $log) {
+                fputcsv($output, [
+                    $log->user_id,
                     $log->action,
-                ], null, 'A' . ($i + 2));
-            }
-
-            $file = tempnam(sys_get_temp_dir(), 'activity_logs') . '.xlsx';
-            (new Xlsx($spreadsheet))->save($file);
-
-            return response()->download($file, 'activity_logs.xlsx')->deleteFileAfterSend(true);
-        }
-
-        if ($format === 'docx') {
-            $phpWord = new PhpWord();
-            $section = $phpWord->addSection();
-
-            foreach ($logs as $log) {
-                $user = $log->user->name ?? 'Guest';
-                $role = ucfirst($log->user->role ?? 'Public');
-                $section->addText("{$log->timestamp} - {$user} - {$role} - {$log->action}");
-            }
-
-            $file = tempnam(sys_get_temp_dir(), 'activity_logs') . '.docx';
-            $phpWord->save($file, 'Word2007');
-
-            return response()->download($file, 'activity_logs.docx')->deleteFileAfterSend(true);
-        }
-
-        if ($format === 'txt') {
-            $content = '';
-            foreach ($logs as $log) {
-                $user = $log->user->name ?? 'Guest';
-                $role = ucfirst($log->user->role ?? 'Public');
-                $content .= "{$log->timestamp} - {$user} ({$role}) - {$log->action}\n";
-            }
-
-            return Response::make($content, 200, [
-                'Content-Type' => 'text/plain',
-                'Content-Disposition' => 'attachment; filename="activity_logs.txt"',
-            ]);
-        }
-
-        return back()->with('error', 'Invalid format selected.');
-    }
-
-    public function exportExcelRaw()
-    {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Set header row
-        $sheet->setCellValue('A1', 'Timestamp');
-        $sheet->setCellValue('B1', 'User');
-        $sheet->setCellValue('C1', 'Role');
-        $sheet->setCellValue('D1', 'Action');
-
-        $logs = ActivityLog::with('user')->latest()->get();
-        $row = 2;
-
-        foreach ($logs as $log) {
-            $sheet->setCellValue("A{$row}", $log->timestamp);
-            $sheet->setCellValue("B{$row}", $log->user->name ?? 'Guest');
-            $sheet->setCellValue("C{$row}", ucfirst($log->user->role ?? 'Public'));
-            $sheet->setCellValue("D{$row}", $log->action);
-            $row++;
-        }
-
-        // Save to temporary file
-        $fileName = 'activity_logs_' . now()->format('Ymd_His') . '.xlsx';
-        $tempFile = tempnam(sys_get_temp_dir(), $fileName);
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($tempFile);
-
-        // Return response
-        return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
-    }
-    
-
-    public function index(Request $request)
-    {
-        $logs = ActivityLog::with('user');
-
-        if ($request->filled('role')) {
-            $logs->whereHas('user', function ($q) use ($request) {
-                $q->where('role', $request->role);
-            });
-        }
-
-        if ($request->filled('from') && $request->filled('to')) {
-            $logs->whereBetween('timestamp', [
-                Carbon::parse($request->from)->startOfDay(),
-                Carbon::parse($request->to)->endOfDay(),
-            ]);
-        }
-
-        $logs = $logs->latest()->get(); // or paginate()
-
-        return view('logs.index', compact('logs'));
-    }
-
-    public function exportLogs($format)
-    {
-        $logs = ActivityLog::with('user')->latest()->get();
-
-        if ($format === 'excel') {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-
-            // Header row
-            $sheet->fromArray([
-                ['Timestamp', 'User', 'Role', 'Action']
-            ]);
-
-            foreach ($logs as $i => $log) {
-                $sheet->fromArray([
+                    $log->target_type,
+                    $log->target_id,
                     $log->timestamp,
-                    $log->user->name ?? 'Guest',
-                    ucfirst($log->user->role ?? 'Public'),
-                    $log->action,
-                ], null, 'A' . ($i + 2));
+                ]);
             }
+            fclose($output);
+        };
 
-            $file = tempnam(sys_get_temp_dir(), 'activity_logs') . '.xlsx';
-            (new Xlsx($spreadsheet))->save($file);
-
-            return response()->download($file, 'activity_logs.xlsx')->deleteFileAfterSend(true);
-        }
-
-        if ($format === 'txt') {
-            $content = '';
-            foreach ($logs as $log) {
-                $user = $log->user->name ?? 'Guest';
-                $role = ucfirst($log->user->role ?? 'Public');
-                $content .= "{$log->timestamp} - {$user} ({$role}) - {$log->action}\n";
-            }
-
-            return Response::make($content, 200, [
-                'Content-Type' => 'text/plain',
-                'Content-Disposition' => 'attachment; filename="activity_logs.txt"',
-            ]);
-        }
-
-        return back()->with('error', 'Invalid format selected.');
+        return Response::stream($callback, 200, array_merge($headers, [
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]));
     }
 
+    protected function buildPdfHtml($collection): string
+    {
+        $rows = '';
+        foreach ($collection as $log) {
+            $rows .= '<tr>'
+                . '<td style="padding:6px;border:1px solid #ddd;">' . e((string)$log->user_id) . '</td>'
+                . '<td style="padding:6px;border:1px solid #ddd;">' . e((string)$log->action) . '</td>'
+                . '<td style="padding:6px;border:1px solid #ddd;">' . e((string)$log->target_type) . '</td>'
+                . '<td style="padding:6px;border:1px solid #ddd;">' . e((string)$log->target_id) . '</td>'
+                . '<td style="padding:6px;border:1px solid #ddd;">' . e(optional($log->timestamp)->format('Y-m-d H:i:s')) . '</td>'
+                . '</tr>';
+        }
+
+        return '<!doctype html><html><head><meta charset="utf-8"><title>Activity Logs</title></head><body>'
+            . '<h2 style="font-family:Arial;margin-bottom:10px;">Activity Logs</h2>'
+            . '<table style="width:100%;border-collapse:collapse;font-family:Arial;font-size:12px;">'
+            . '<thead><tr>'
+            . '<th style="padding:6px;border:1px solid #ddd;text-align:left;">User ID</th>'
+            . '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Action</th>'
+            . '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Target Type</th>'
+            . '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Target ID</th>'
+            . '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Timestamp</th>'
+            . '</tr></thead><tbody>'
+            . $rows
+            . '</tbody></table></body></html>';
+    }
+
+    /**
+     * Export raw logs for admin dashboard (CSV).
+     */
+    public function exportLogs(string $format = 'csv')
+    {
+        return $this->export($format);
+    }
+
+    /**
+     * Recent logs endpoint for dashboard widgets.
+     */
+    public function recent()
+    {
+        $logs = ActivityLog::with('user')
+            ->orderByDesc('timestamp')
+            ->take(20)
+            ->get();
+
+        return response()->json($logs);
+    }
 }
+
+

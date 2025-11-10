@@ -1,3 +1,34 @@
+## Password Reset Approval Flow
+
+This project ships with an approval-based password reset system. The flow works as follows:
+
+1. Guests use the `Forgot Password` form to submit their campus email. The request is stored in `password_reset_requests` with status `pending`.
+2. Every administrator receives an email notification pointing to `/admin/password-reset-requests`, where all requests can be approved or declined.
+3. Approving a request generates a secure token via Laravel&rsquo;s `Password::sendResetLink()` broker, emails the official reset link to the user&rsquo;s Gmail inbox, and records the action (including approver and token) in the table.
+4. Declining a request stores the reason (optional) and emails the user letting them know the reset was denied.
+
+### Mailer configuration example (SendGrid SMTP)
+
+Update your `.env` so the application can deliver both admin notifications and the official reset link even on localhost:
+
+```
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.sendgrid.net
+MAIL_PORT=587
+MAIL_USERNAME=apikey
+MAIL_PASSWORD=your_sendgrid_api_key
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=psuguide@your-domain.com
+MAIL_FROM_NAME="PSU Guide"
+
+# Optional: address used when routing admin approval emails
+ADMIN_EMAIL=psuguide.info@gmail.com
+```
+
+> Tip: For Gmail testing, enable the [Google SMTP relay](https://support.google.com/a/answer/176600) or use a provider like SendGrid/Postmark that works without additional Gmail security settings.
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

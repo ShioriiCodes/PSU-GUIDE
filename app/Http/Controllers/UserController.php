@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use App\Models\User;
-use App\Helpers\ActivityLogger;
-
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -30,64 +28,101 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'student_number' => 'nullable|string|max:50',
-            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('profile_picture')) {
-            if ($user->profile_picture) {
-                Storage::delete('public/' . $user->profile_picture);
-            }
-
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $user->profile_picture = $path;
+            $this->deleteProfilePicture($user->profile_picture);
+            $user->profile_picture = $this->storeProfilePicture($request->file('profile_picture'));
         }
 
         $user->fill($request->only('name', 'email', 'student_number'));
         $user->save();
 
-        // ✅ Log the profile update
         ActivityLogger::log('update_profile', get_class($user), $user->id);
 
         return back()->with('success', 'Profile updated successfully!');
     }
 
-        public function updatePassword(Request $request)
-        {
-            $user = Auth::user();
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
 
-            $request->validate([
-                'current_password' => ['required'],
-                'new_password' => ['required', 'confirmed', 'min:8'],
-            ]);
+        $request->validate([
+            'current_password' => ['required'],
+            'new_password' => ['required', 'confirmed', 'min:8'],
+        ]);
 
-            if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'Current password is incorrect.']);
-            }
-
-            $user->password = bcrypt($request->new_password);
-            $user= Auth::user();
-
-            // ✅ Correct dynamic class reference
-            \App\Helpers\ActivityLogger::log('change_password', get_class($user), $user->id);
-
-            return back()->with('success_password', 'Password updated successfully!');
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.']);
         }
 
+        $user->password = bcrypt($request->new_password);
+        $user = Auth::user();
 
-        public function updatePreferences(Request $request)
-        {
-                $request->validate([
+        ActivityLogger::log('change_password', get_class($user), $user->id);
 
-                    'notifications' => 'array',
-                    'notifications.*' => 'in:email,sms',
-                ]);
+        return back()->with('success_password', 'Password updated successfully!');
+    }
 
-            $user = $request->user();
-            $user->notification_settings = $request->input('notifications', []);
+    public function updatePreferences(Request $request)
+    {
+        $request->validate([
+            'notifications' => 'array',
+            'notifications.*' => 'in:email,sms',
+        ]);
 
-            $user->save();
+        $user = $request->user();
+        $user->notification_settings = $request->input('notifications', []);
 
-            return back()->with('success_preferences', 'Preferences updated successfully.');
+        $user->save();
+
+        return back()->with('success_preferences', 'Preferences updated successfully.');
+    }
+
+    protected function profilePictureDirectory(): string
+    {
+        $directory = public_path('storage/profile_pictures');
+        File::ensureDirectoryExists($directory);
+
+        return $directory;
+    }
+
+    protected function storeProfilePicture($file): string
+    {
+        $directory = $this->profilePictureDirectory();
+
+        $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        $safeName = Str::slug($name);
+        if (empty($safeName)) {
+            $safeName = 'profile-picture';
         }
 
+        $filename = now()->format('YmdHis') . '_' . $safeName . '.' . $extension;
+
+        $file->move($directory, $filename);
+
+        return $filename;
+    }
+
+    protected function deleteProfilePicture(?string $storedValue): void
+    {
+        if (!$storedValue) {
+            return;
+        }
+
+        $relativePath = str_contains($storedValue, '/')
+            ? ltrim($storedValue, '/')
+            : 'profile_pictures/' . $storedValue;
+
+        $fullPath = public_path('storage/' . $relativePath);
+
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
+    }
 }
+
+

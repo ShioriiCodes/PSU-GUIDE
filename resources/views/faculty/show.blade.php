@@ -14,7 +14,12 @@
         <!-- Profile Picture -->
         <div class="flex-shrink-0 text-center">
             @if ($faculty->profile_picture)
-                <img src="{{ asset('storage/' . $faculty->profile_picture) }}"
+                @php
+                    $facultyProfilePath = str_contains($faculty->profile_picture, '/')
+                        ? ltrim($faculty->profile_picture, '/')
+                        : 'profile_pictures/' . $faculty->profile_picture;
+                @endphp
+                <img src="{{ asset('storage/' . $facultyProfilePath) }}"
                     alt="Profile Picture"
                     class="w-40 h-40 rounded-full object-cover border shadow">
             @else
@@ -55,12 +60,12 @@
             <button type="submit" name="format" value="pdf" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">
                 Download PDF
             </button>
-            <button type="submit" name="format" value="excel" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
+            {{-- <button type="submit" name="format" value="excel" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
                 Download Excel
             </button>
             <button type="submit" name="format" value="txt" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
                 Download TXT
-            </button>
+            </button> --}}
         </form>
 
 

@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ActivityLog extends Model
 {
-    public $timestamps = false; // since you're using `timestamp` instead of `created_at`
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
@@ -16,13 +18,19 @@ class ActivityLog extends Model
         'timestamp',
     ];
 
-    public function user()
+    protected $casts = [
+        'timestamp' => 'datetime',
+    ];
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function target()
+    public function target(): MorphTo
     {
         return $this->morphTo(null, 'target_type', 'target_id');
     }
 }
+
+

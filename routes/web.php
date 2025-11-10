@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminImportController;
+use App\Http\Controllers\Admin\PasswordResetRequestController as AdminPasswordResetRequestController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\AnnouncementController;
@@ -19,6 +20,7 @@ use App\Models\Announcement;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\AnnouncementStatsController;
+use App\Http\Controllers\NotificationController;
 
 
 // User Routes
@@ -28,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/user/update-password', [UserController::class, 'updatePassword'])->name('user.updatePassword');
     Route::put('/user/preferences', [UserController::class, 'updatePreferences'])->name('user.preferences.update');;
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('/announcements/mark-read', [AnnouncementController::class, 'markAsRead'])->name('announcements.markRead');
 
 });
 
@@ -36,17 +39,42 @@ require __DIR__.'/auth.php';
 // Static Pages
 Route::get('/', function () {
     return view('index');
-})->name('home');
+})->middleware(\App\Http\Middleware\LogPageView::class)->name('home');
 Route::get('/about', function () {
     return view('about');
-})->name('about');
+})->middleware(\App\Http\Middleware\LogPageView::class)->name('about');
 
-Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement');
+Route::get('/announcement', [AnnouncementController::class, 'index'])->middleware(\App\Http\Middleware\LogPageView::class)->name('announcement');
 Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcement.store');
 
 Route::get('/contact', function () {
     return view('contact');
-})->name('contact');
+})->middleware(\App\Http\Middleware\LogPageView::class)->name('contact');
+
+// Storage file serving route for InfinityFree hosting
+// Serves files from storage/posters and storage/profile_pictures
+Route::get('/storage/{type}/{filename}', function ($type, $filename) {
+    $allowedTypes = ['posters', 'profile_pictures'];
+    
+    if (!in_array($type, $allowedTypes)) {
+        abort(404);
+    }
+    
+    $filePath = storage_path($type . '/' . $filename);
+    
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+    
+    $mimeType = mime_content_type($filePath);
+    if (!$mimeType) {
+        $mimeType = 'application/octet-stream';
+    }
+    
+    return response()->file($filePath, [
+        'Content-Type' => $mimeType,
+    ]);
+})->where(['filename' => '.*'])->name('storage.file');
 
 // Admin Dashboard and Import Routes
 Route::middleware(['auth'])->group(function () {
@@ -66,6 +94,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
     Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
     Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
+    // Single create endpoints for Admin
+    Route::post('/admin/students', [AdminDashboardController::class, 'storeStudent'])->name('admin.students.store');
+    Route::post('/admin/faculty', [AdminDashboardController::class, 'storeFaculty'])->name('admin.faculty.store');
+
+    Route::get('/admin/password-reset-requests', [AdminPasswordResetRequestController::class, 'index'])->name('admin.password-resets.index');
+    Route::post('/admin/password-reset-requests/{resetRequest}/approve', [AdminPasswordResetRequestController::class, 'approve'])->name('admin.password-resets.approve');
+    Route::post('/admin/password-reset-requests/{resetRequest}/decline', [AdminPasswordResetRequestController::class, 'decline'])->name('admin.password-resets.decline');
 
 });
 
@@ -80,14 +115,21 @@ Route::middleware(['auth'])->group(function () {
         ->name('dashboard.registrar');
     Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcement.store');
     Route::post('/admin/announcements', [AnnouncementController::class, 'store'])->name('announcement.admin.store');
-    Route::put('/admin/profile/update', [AdminController::class, 'update'])->name('admin.update');
-
-    Route::get('/usg', function () {
-        return view('dashboard.usg');
-    })->name('dashboard.usg');
+    // Route::get('/usg', function () {
+    //     return view('dashboard.usg');
+    // })->name('dashboard.usg');
 });
 
 Route::get('/activity-logs/export/{format}', [ActivityLogController::class, 'export'])->name('activityLogs.export');
+
+// Notifications API
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications/latest', [NotificationController::class, 'latest'])->name('notifications.latest');
+    Route::get('/notifications/unread-by-announcement', [NotificationController::class, 'unreadByAnnouncement'])->name('notifications.unreadByAnnouncement');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markRead'])->defaults('id', 'all')->name('notifications.readAll');
+    Route::post('/notifications/read-announcement/{announcementId}', [NotificationController::class, 'markReadByAnnouncement'])->name('notifications.readByAnnouncement');
+});
 
 // Faculty Export Route
 Route::post('/faculty/{id}/export', [FacultyController::class, 'export'])->name('faculty.export');
@@ -112,7 +154,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/students/{id}/export', [StudentController::class, 'export'])->name('students.export');
     // Toggle active/inactive
     Route::post('/students/{id}/toggle-status', [StudentController::class, 'toggleStatus'])->name('students.toggleStatus');
-    // Delete 
+    // Delete
     Route::delete('/accounts/{id}', [StudentController::class, 'destroy'])->name('accounts.destroy');
 });
 
@@ -149,7 +191,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
     Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
     Route::get('/logs/export/{format}', [ActivityLogController::class, 'exportLogs'])->name('logs.export');
-    Route::get('/dashboard/admin', [ActivityLogController::class, 'recent'])->name('dashboard.admin');
-        
+    Route::get('/dashboard/admin/recent-logs', [ActivityLogController::class, 'recent'])->name('dashboard.admin.recent');
+
     // Show forgot password form
- 

@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Approval extends Model
 {
     use HasFactory;
+
+    protected $table = 'approvals';
+    public $timestamps = false;
 
     protected $fillable = [
         'announcement_id',
@@ -18,15 +22,20 @@ class Approval extends Model
         'rejected_at',
     ];
 
-    public $timestamps = false;
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
+    ];
 
-    public function announcement()
+    public function announcement(): BelongsTo
     {
         return $this->belongsTo(Announcement::class);
     }
 
-    public function approver()
+    public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
 }
+
+

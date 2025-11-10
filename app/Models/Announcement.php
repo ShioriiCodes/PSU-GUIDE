@@ -1,17 +1,18 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Notifications\DatabaseNotification;
-
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Schema;
 
-    class Announcement extends Model
-    {
-        
+class Announcement extends Model
+{
     use HasFactory;
+
     protected $fillable = [
         'title',
         'content',
@@ -20,44 +21,42 @@ use Illuminate\Database\Eloquent\Model;
         'is_approved',
         'posted_by',
         'status',
-        'poster_image'
+        'poster_image',
     ];
 
-
-    protected static function booted()
+    protected static function booted(): void
     {
-        static::deleting(function ($announcement) {
-            // Delete notifications related to this announcement
+        static::deleting(function (Announcement $announcement) {
             if (Schema::hasTable('notifications')) {
                 DatabaseNotification::where('data->announcement_id', $announcement->id)->delete();
             }
         });
     }
 
-    public function user()
-        {
-            return $this->belongsTo(User::class, 'posted_by');
-        }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'posted_by');
+    }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
-    
-    public function getTitle()
-    {
 
-        return $this->title;
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class)->whereNull('parent_id')->latest();
     }
 
-    public function approvals()
+    public function images(): HasMany
+    {
+        return $this->hasMany(AnnouncementImage::class);
+    }
+
+    public function approvals(): HasMany
     {
         return $this->hasMany(Approval::class);
     }
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-
 }
+
+

@@ -9,9 +9,9 @@
         <h1 class="text-3xl font-bold mb-3 text-[#D5451B] text-center sm:text-left">Activity Logs</h1>
         {{-- Export Buttons --}}
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <a href="{{ route('logs.export', ['format' => 'excel']) }}"
-               class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-center transition">
-                Export to Excel
+            <a href="{{ route('activityLogs.export', ['format' => 'pdf']) }}"
+               class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-center transition">
+                Export to PDF
             </a>
             <a href="{{ route('logs.export', ['format' => 'txt']) }}"
                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-center transition">
